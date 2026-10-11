@@ -1,0 +1,431 @@
+/* Portfolio styles. Load tokens.css first.
+   The visual language (type, colour, shape, honest labels) is the Story Page design system's.
+   The layout is lighter: a sticky top bar instead of a rail, and one reading column.
+   Content is fully visible without JavaScript. Motion comes from CSS scroll-driven animations
+   where the browser supports them, and everything still reads when it does not. */
+
+/* ---------- base ---------- */
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px;interpolate-size:allow-keywords}
+body{--gut:clamp(16px,5vw,72px);margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:18px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+h1,h2,h3,h4{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.08;letter-spacing:-.01em}
+p{margin:0;text-wrap:pretty}
+button{font-family:inherit}
+.lbl{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.kbd{font-family:var(--f-mono);font-size:12px;border:1px solid var(--line);border-radius:5px;padding:1px 6px;background:var(--panel)}
+
+/* ---------- reading progress: driven by the page's own scroll timeline ---------- */
+.progress{position:fixed;left:0;top:env(safe-area-inset-top,0px);height:3px;width:100%;z-index:40;pointer-events:none}
+.progress i{display:block;height:100%;background:var(--accent);transform-origin:0 50%;transform:scaleX(0)}
+@keyframes prog{to{transform:scaleX(1)}}
+@supports (animation-timeline:scroll()){
+  .progress i{animation:prog linear both;animation-timeline:scroll(root)}
+}
+
+/* ---------- top bar ---------- */
+.topbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:14px;padding:calc(10px + env(safe-area-inset-top,0px)) var(--gut) 10px;background:color-mix(in srgb,var(--paper) 78%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3);border-bottom:1px solid var(--line)}
+@keyframes bar-line{from{border-bottom-color:transparent}}
+@supports (animation-timeline:scroll()){
+  .topbar{animation:bar-line linear both;animation-timeline:scroll(root);animation-range:0 140px}
+}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);margin-right:auto;min-width:0}
+.brand .dot{flex:none;width:30px;height:30px;border-radius:9px;background:var(--accent);color:var(--paper);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:17px}
+.brand b{font-family:var(--f-display);font-size:17px;white-space:nowrap}
+.chapters{position:relative;isolation:isolate;display:flex;gap:2px}
+.chapters a{display:flex;gap:8px;align-items:baseline;text-decoration:none;color:var(--muted);font-weight:600;font-size:15px;padding:6px 12px;border-radius:999px;white-space:nowrap;transition:color .25s}
+.chapters a .n{font-family:var(--f-mono);font-size:12px;opacity:.8}
+.chapters a:hover{color:var(--ink)}
+.chapters a[aria-current="true"]{color:var(--ink);background:var(--accent-soft)}
+/* with anchor positioning, one highlight pill slides between the links instead of jumping */
+@supports (anchor-name:--a) and (left:anchor(left)){
+  .chapters a[aria-current="true"]{background:none;anchor-name:--nav-on}
+  .chapters::before{content:"";position:absolute;z-index:-1;position-anchor:--nav-on;left:anchor(left);top:anchor(top);width:anchor-size(width);height:anchor-size(height);border-radius:999px;background:var(--accent-soft);transition:left .45s var(--ease-out),width .45s var(--ease-out),opacity .3s}
+  .chapters:not(:has([aria-current="true"]))::before{opacity:0}
+}
+.theme-btn{flex:none;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--ink);display:grid;place-items:center;cursor:pointer;transition:border-color .25s,rotate .5s var(--ease-out)}
+.theme-btn:hover{border-color:var(--accent);rotate:180deg}
+.theme-btn svg{width:18px;height:18px}
+
+/* the theme switch is a view transition: the new theme grows out of the button */
+::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
+::view-transition-new(root){z-index:1}
+
+main{min-width:0;padding-inline:var(--gut);padding-bottom:96px}
+.col{max-width:1040px;margin-inline:auto}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;gap:8px;font:600 16px var(--f-body);text-decoration:none;color:var(--ink);padding:11px 20px;border-radius:999px;border:1px solid var(--line);background:var(--panel);transition:translate .25s var(--ease-out),border-color .25s}
+.btn:hover{translate:0 -2px;border-color:var(--accent)}
+.btn:active{translate:0 0}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+.cta-row{display:flex;flex-wrap:wrap;gap:10px}
+
+/* ---------- hero ---------- */
+.hero{position:relative;isolation:isolate;margin-inline:calc(-1*var(--gut));padding-inline:var(--gut);min-height:min(calc(100svh - 57px),920px);display:grid;align-items:center;overflow:clip}
+/* the canvas reads its two colours from here, so they follow the theme */
+#net{position:absolute;inset:0;width:100%;height:100%;z-index:-1;color:var(--accent);caret-color:var(--muted);-webkit-mask-image:linear-gradient(100deg,transparent 18%,#000 72%);mask-image:linear-gradient(100deg,transparent 18%,#000 72%)}
+.hero-in{width:100%;display:grid;gap:26px;padding-block:clamp(40px,8vh,96px) 64px}
+.eyebrow{font-family:var(--f-mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.hero h1{font-size:clamp(44px,7.4vw,96px);font-weight:800;max-width:14ch}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero h1 .w{display:inline-block}
+.lede{font-size:clamp(19px,2vw,23px);color:var(--muted);max-width:60ch}
+.hero-meta{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:15px;color:var(--muted)}
+.scroll-cue{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--muted);margin-top:8px}
+.scroll-cue i{width:2px;height:34px;background:linear-gradient(var(--accent),transparent);display:block;animation:cue 1.8s ease-in-out infinite}
+@keyframes cue{0%{transform:scaleY(.3);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}100%{transform:scaleY(.3);transform-origin:bottom}}
+@keyframes word{from{opacity:0;transform:translateY(.45em) rotate(3deg);filter:blur(8px)}}
+@keyframes rise{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+@keyframes hero-out{to{opacity:0;transform:translateY(-48px) scale(.97)}}
+@media (prefers-reduced-motion:no-preference){
+  .hero h1 .w{animation:word .9s var(--ease-out) both;animation-delay:calc(var(--i)*80ms + .1s)}
+  .hero-in>:not(h1){animation:rise .8s var(--ease-out) both;animation-delay:.75s}
+  .hero-in>.eyebrow{animation-delay:0s}
+  @supports (animation-timeline:scroll()){
+    .hero-in>h1{animation:hero-out linear both;animation-timeline:scroll(root);animation-range:18vh 88vh}
+    #net{animation:hero-out linear both;animation-timeline:scroll(root);animation-range:10vh 95vh}
+  }
+}
+
+/* ---------- chapters and sub-sections ---------- */
+.chapter{padding-block:96px 24px;border-top:1px solid var(--line)}
+.ch-head{display:grid;gap:14px;margin-bottom:48px}
+.ch-num{font-family:var(--f-display);font-weight:800;font-size:clamp(64px,9vw,120px);line-height:.9;color:var(--accent-soft);-webkit-text-stroke:1.5px var(--accent);justify-self:start}
+.ch-head h2{font-size:clamp(34px,4.6vw,58px);font-weight:800;max-width:20ch}
+.ch-head p{font-size:20px;color:var(--muted);max-width:62ch}
+.sub{padding-block:40px}
+.sub h3{font-size:clamp(24px,2.6vw,32px);font-weight:700;margin-bottom:12px}
+.sub .sub-lede{color:var(--muted);max-width:64ch;margin-bottom:28px}
+.cont-tag{display:inline-flex;align-items:center;gap:8px;font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--c,var(--accent));font-weight:600}
+.cont-tag i{width:8px;height:8px;border-radius:50%;background:var(--c,var(--accent))}
+.note-line{margin-top:14px;color:var(--muted);font-size:15px;max-width:72ch}
+
+/* ---------- reveal ----------
+   Two kinds. Scrubbed reveals (.rv, .stagger) are tied to scroll position by a view timeline and need
+   no script. Timed reveals (.io) get .in from an IntersectionObserver, for things that should play
+   at their own pace: a terminal typing, a checklist ticking. */
+@keyframes slide{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:none}}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+@keyframes num-drift{0%{opacity:0;transform:translateY(46px)}22%{opacity:1}100%{opacity:1;transform:translateY(-34px)}}
+@supports (animation-timeline:view()){
+  @media (prefers-reduced-motion:no-preference){
+    .rv{animation:rise linear both;animation-timeline:view();animation-range:entry 0% cover 24%}
+    .stagger>*{animation:rise linear both;animation-timeline:view();animation-range:entry calc(var(--i,0)*6%) cover calc(22% + var(--i,0)*4%)}
+    .ch-head .ch-num{animation:num-drift linear both;animation-timeline:view();animation-range:entry 0% exit 100%}
+  }
+}
+
+/* ---------- grids and cards ---------- */
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card h4{font-size:21px;font-weight:700}
+.card p{color:var(--muted);font-size:16.5px}
+.card .pill{align-self:flex-start;margin-top:auto}
+.card.big{padding:26px;gap:12px}
+.card.big h4{font-size:24px}
+.accented .card{border-top:4px solid var(--accent)}
+.accented .card .lbl{color:var(--accent)}
+.ico{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}
+.ico svg{width:20px;height:20px}
+.rules{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:15.5px}
+/* a soft light that follows the pointer across a card */
+.spot{position:relative;overflow:hidden;transition:border-color .3s}
+.spot::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(260px circle at var(--mx,50%) var(--my,0%),color-mix(in srgb,var(--accent) 13%,transparent),transparent 70%);opacity:0;transition:opacity .35s}
+@media (hover:hover){
+  .spot:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+  .spot:hover::after{opacity:1}
+}
+
+/* ---------- pills and chips ---------- */
+.pill{font-family:var(--f-mono);font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:4px 10px;display:inline-flex;align-items:center;gap:6px}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.pill.live{background:var(--accent-soft);color:var(--accent)}
+.pill.plan{background:var(--gold-soft);color:var(--gold)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chips>span:not(.pill),.tools dd span{font-family:var(--f-mono);font-size:11.5px;font-weight:600;letter-spacing:.04em;border:1px solid var(--line);border-radius:999px;padding:3px 9px;color:var(--muted);background:var(--paper)}
+
+/* ---------- glossary: popovers anchored to the term that opened them ---------- */
+.term-btn{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:help;text-decoration:underline dotted var(--accent);text-decoration-thickness:2px;text-underline-offset:.22em}
+.term-btn:hover{color:var(--accent)}
+.nb{white-space:nowrap}
+.gloss{border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);padding:12px 14px;width:max-content;max-width:min(320px,calc(100vw - 32px));font-family:var(--f-body);font-size:15px;line-height:1.45;font-weight:400;box-shadow:var(--shadow);opacity:0;translate:0 6px;transition:opacity .22s,translate .22s var(--ease-out),overlay .22s allow-discrete,display .22s allow-discrete}
+.gloss b{display:block;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+.gloss:popover-open{opacity:1;translate:0 0}
+@starting-style{.gloss:popover-open{opacity:0;translate:0 6px}}
+@supports (position-area:bottom){
+  .gloss{inset:auto;margin:8px 0;position-area:bottom span-right;position-try-fallbacks:flip-inline,flip-block,flip-block flip-inline}
+}
+
+/* ---------- the path: three rooms that stack as they are read ---------- */
+.rooms{display:flex;flex-direction:column;gap:28px;view-timeline:--rooms block}
+.room{container-type:inline-size}
+.room-in{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:32px;align-items:center;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:6px 18px 18px 6px;padding:26px 30px;transform-origin:50% 0}
+.room-copy{display:flex;flex-direction:column;gap:10px;min-width:0}
+.room-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px}
+.room h3{font-size:clamp(24px,2.6vw,32px);font-weight:700}
+.when{display:flex;flex-wrap:wrap;gap:0 16px;font-family:var(--f-mono);font-size:12.5px;color:var(--muted);letter-spacing:.03em}
+.when span{white-space:nowrap}
+.when span:first-child{color:var(--ink);font-weight:600}
+.room-copy>p{font-size:16.5px}
+.room ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:16px}
+.stuck{display:flex;flex-direction:column;gap:2px;font-family:var(--f-display);font-weight:700;font-size:22px;line-height:1.2;margin-top:4px}
+.stuck .lbl{color:var(--c)}
+.room-vis{min-width:0;display:flex;flex-direction:column;gap:10px}
+@container (width < 780px){
+  .room-in{grid-template-columns:minmax(0,1fr);gap:22px;padding:24px 20px}
+}
+@keyframes room-back{to{transform:scale(calc(1 - (var(--n) - 1 - var(--i))*.035));filter:brightness(calc(1 - (var(--n) - 1 - var(--i))*.035))}}
+/* cards are about 560px tall at this width, so they only stack when the window can hold one */
+@media (min-width:1200px) and (min-height:720px){
+  .room{position:sticky;top:calc(76px + var(--i)*16px)}
+  .room-in{min-height:540px}
+  @supports (animation-timeline:view()){
+    @media (prefers-reduced-motion:no-preference){
+      .room-in{animation:room-back linear both;animation-timeline:--rooms;animation-range:exit-crossing calc(var(--i)/var(--n)*100%) exit-crossing calc((var(--i) + 1)/var(--n)*100%)}
+    }
+  }
+}
+
+/* ---------- mock frames shared by the checklist and diagrams ---------- */
+.doc-head{display:flex;justify-content:space-between;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);font-family:var(--f-mono);font-size:12.5px;color:var(--muted)}
+.doc-head .tag,.term .bar .tag{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.ill{font-family:var(--f-mono);font-size:11px;color:var(--gold);letter-spacing:.06em;text-transform:uppercase}
+
+/* release checklist */
+.checks{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.checks-body{padding:12px;display:flex;flex-direction:column;gap:8px}
+.ck{display:grid;grid-template-columns:26px minmax(0,1fr);gap:12px;align-items:start;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.ck i{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--paper);font-style:normal;font-weight:700;font-size:14px}
+.ck b{display:block;font-size:16px}
+.ck span{color:var(--muted);font-size:14.5px}
+.checks.in .ck{animation:slide .6s var(--ease-out) both;animation-delay:calc(var(--i)*260ms)}
+.checks.in .ck i{animation:pop .8s var(--ease-spring) both;animation-delay:calc(var(--i)*260ms + .2s)}
+
+/* terminal mock */
+.term{background:var(--term);color:var(--term-fg);border-radius:16px;font-family:var(--f-mono);font-size:14px;line-height:1.7;padding:16px 18px;box-shadow:var(--shadow);overflow-x:auto;min-width:0}
+.term .bar{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.term .bar i{width:10px;height:10px;border-radius:50%;background:#3A4A48;display:block}
+.term .bar .tag{margin-left:auto;color:var(--term-dim)}
+.term .ln{white-space:pre}
+.term .d{color:var(--term-dim)}
+.term .ok{color:var(--term-ok)}
+.term .y{color:#F2C46B}
+.term.in .ln{animation:type .35s steps(8) both;animation-delay:calc(var(--i,0)*300ms)}
+@keyframes type{from{opacity:0;clip-path:inset(0 100% 0 0)}to{opacity:1;clip-path:inset(0 0 0 0)}}
+.replay{align-self:flex-start;font-family:var(--f-mono);font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:none;border:1px solid var(--line);border-radius:999px;padding:4px 12px;cursor:pointer;transition:color .25s,border-color .25s}
+.replay:hover{color:var(--accent);border-color:var(--accent)}
+
+/* architecture diagrams (inline SVG) */
+.arch{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px;overflow-x:auto}
+.arch svg{display:block;width:100%;min-width:600px;height:auto}
+.arch .box{fill:var(--paper);stroke:var(--line);stroke-width:1.5}
+.arch .box.hl{fill:var(--accent);stroke:var(--accent)}
+.arch text{font-family:var(--f-body);fill:var(--ink);font-size:15px}
+.arch text.t{font-family:var(--f-display);font-weight:700;font-size:18px}
+.arch text.s{font-size:13.5px}
+.arch text.inv{fill:var(--paper)}
+.arch .flow{stroke:var(--accent);stroke-width:2;fill:none;stroke-dasharray:6 6}
+.arch.in .flow{animation:dash 1.2s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-24}}
+.arch.mini{background:var(--paper);border-radius:14px;padding:16px}
+.arch.mini svg{min-width:340px}
+.arch.mini text.t{font-size:16px}
+.arch.mini text.s{font-size:12px}
+.arch-cap{display:flex;justify-content:space-between;gap:12px;margin-top:10px}
+
+/* ---------- BondScanner: definition and role card ---------- */
+.split{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:40px;align-items:center}
+.big-def{font-family:var(--f-display);font-size:clamp(26px,3vw,36px);font-weight:700;line-height:1.2}
+.big-def mark{background:var(--gold-soft);color:var(--ink);padding:0 .15em;border-radius:4px}
+.def-note{color:var(--muted);margin-top:16px;max-width:56ch}
+@property --a{syntax:"<angle>";inherits:false;initial-value:0deg}
+@keyframes turn{to{--a:360deg}}
+.idcard{position:relative;isolation:isolate;border-radius:18px;padding:26px;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow)}
+.idcard::before{content:"";position:absolute;inset:-2px;z-index:-2;border-radius:20px;background:conic-gradient(from var(--a),var(--accent),var(--line) 22%,var(--line) 72%,var(--accent));animation:turn 7s linear infinite}
+.idcard::after{content:"";position:absolute;inset:0;z-index:-1;border-radius:18px;background:var(--panel)}
+.idcard h4{font-size:26px;font-weight:800}
+.roles{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.roles li{display:grid;grid-template-columns:26px minmax(0,1fr);gap:12px;align-items:center}
+.roles i{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-style:normal;font-weight:700;font-size:14px}
+.roles b{font-size:17px;display:block;line-height:1.2}
+.roles span{color:var(--muted);font-size:14.5px}
+.id-foot{display:flex;flex-wrap:wrap;gap:6px;padding-top:14px;border-top:1px solid var(--line)}
+
+/* ---------- stats ---------- */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.stat{border-top:2px solid var(--ink);padding-top:14px;display:flex;flex-direction:column;gap:6px}
+.stat b{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,4vw,54px);line-height:1;font-variant-numeric:tabular-nums;color:var(--accent);white-space:nowrap}
+.stat>span{font-size:15.5px;color:var(--muted)}
+.stats.in .stat{animation:rise .7s var(--ease-out) both}
+.stats.in .stat:nth-child(2){animation-delay:.1s}.stats.in .stat:nth-child(3){animation-delay:.2s}.stats.in .stat:nth-child(4){animation-delay:.3s}
+
+/* ---------- follow one order: radio steps drive the diagram through :has() ---------- */
+.flowdemo{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.35fr);gap:28px;align-items:start}
+.flow-steps{border:0;margin:0;padding:0;min-width:0;display:flex;flex-direction:column;gap:8px}
+.flow-steps legend{padding:0;margin-bottom:10px}
+.st{position:relative;display:grid;grid-template-columns:30px minmax(0,1fr);gap:12px;align-items:start;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel);cursor:pointer;transition:border-color .25s,background .25s}
+.st input{position:absolute;inset:0;margin:0;opacity:0;cursor:pointer}
+.st .num{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-family:var(--f-mono);font-weight:700;font-size:13px;transition:background .25s,color .25s}
+.st .tx{min-width:0}
+.st b{display:block;font-size:16.5px;line-height:30px}
+.st .more{display:block;height:0;overflow:clip;color:var(--muted);font-size:15px;line-height:1.45;transition:height .45s var(--ease-out)}
+.st .more>span{display:block;padding-bottom:4px}
+.st:hover{border-color:color-mix(in srgb,var(--accent) 50%,var(--line))}
+.st:has(:checked){border-color:var(--accent);background:color-mix(in srgb,var(--accent-soft) 50%,var(--panel))}
+.st:has(:checked) .num{background:var(--accent);color:var(--paper)}
+.st:has(:checked) .more{height:auto}
+.st:has(:focus-visible){outline:2px solid var(--accent);outline-offset:3px}
+@supports not selector(:has(*)){.st .more{height:auto}}
+.flow-stage{min-width:0}
+.flowdemo .arch{padding:16px}
+.flowdemo .arch svg{min-width:520px;max-width:720px;margin-inline:auto}
+.flowdemo .arch svg.flow-tall{display:none;min-width:0;max-width:400px}
+.flowdemo text.t{font-size:15.5px}
+.flowdemo text.h{font-size:18px}
+.flowdemo text.s{font-size:12.5px}
+.flowdemo .node .box{transition:stroke .35s,fill .35s}
+.flowdemo .edge{stroke:var(--line);stroke-width:2;fill:none;stroke-dasharray:6 6;transition:stroke .35s}
+.flowdemo .pkt{fill:var(--gold);opacity:0;transition:opacity .35s}
+.flowdemo .mod rect{fill:color-mix(in srgb,var(--paper) 14%,transparent);stroke:color-mix(in srgb,var(--paper) 40%,transparent);stroke-width:1.5;transition:fill .35s}
+.flowdemo .mod text{fill:var(--paper);font-weight:600;font-size:14.5px;transition:fill .35s}
+.flowdemo:has(#st1:checked) [data-s~="1"],
+.flowdemo:has(#st2:checked) [data-s~="2"],
+.flowdemo:has(#st3:checked) [data-s~="3"],
+.flowdemo:has(#st4:checked) [data-s~="4"],
+.flowdemo:has(#st5:checked) [data-s~="5"],
+.flowdemo:has(#st6:checked) [data-s~="6"]{
+  &.edge{stroke:var(--accent);animation:dash 1.2s linear infinite}
+  &.pkt{opacity:1}
+  &.node .box{stroke:var(--accent);stroke-width:2.5;fill:var(--accent-soft)}
+  &.mod rect{fill:var(--paper);stroke:var(--paper)}
+  &.mod text{fill:var(--accent)}
+}
+
+/* ---------- AI at work: a scene with numbered steps beside a chat mock ---------- */
+.scene{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:32px;align-items:start}
+.flow4{display:flex;flex-direction:column;gap:10px}
+.flow4 .f{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.flow4 .n{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-family:var(--f-mono);font-weight:700;font-size:13px}
+.flow4 b{font-size:16px}
+.flow4 p{color:var(--muted);font-size:14.5px}
+.chat{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;min-width:0}
+.chat-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);font-weight:700;font-size:15px}
+.chat-head .tag{font-family:var(--f-mono);font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.chat-body{padding:8px 4px 12px;display:flex;flex-direction:column}
+.msg{display:grid;grid-template-columns:36px minmax(0,1fr);gap:10px;padding:8px 12px}
+.av{width:36px;height:36px;border-radius:9px;display:grid;place-items:center;font-weight:700;font-size:13.5px;color:var(--paper);background:var(--c,var(--muted));font-family:var(--f-display)}
+.av.hl{background:var(--accent)}
+.who{font-weight:700;font-size:15px}
+.who .t{font-weight:400;color:var(--muted);font-size:12.5px;margin-left:6px}
+.who .bot{font-family:var(--f-mono);font-size:10.5px;background:var(--accent-soft);color:var(--accent);padding:1px 5px;border-radius:4px;margin-left:6px;vertical-align:2px}
+.msg p,.msg li{font-size:15.5px;line-height:1.45}
+.msg ul{margin:4px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px}
+.msg .meta{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);margin-top:6px}
+.msg .file{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:14px;margin-top:8px;background:var(--paper)}
+.chat.in .msg{animation:msg .55s var(--ease-out) both;animation-delay:calc(var(--i,0)*520ms)}
+@keyframes msg{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.bot-stats{margin-top:32px}
+
+/* ---------- pillars and hub: the three lessons meet ---------- */
+.pillars{display:flex;flex-direction:column;gap:12px}
+.pillar{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) auto;gap:22px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 22px 18px 26px;overflow:hidden}
+.pillar::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c);transform-origin:top;transition:transform .8s var(--ease-draw);transition-delay:calc(var(--i,0)*120ms + .25s)}
+/* pre-animation states only apply once the script is running, so the page is complete without it */
+.js .pillars:not(.in) .pillar::before{transform:scaleY(0)}
+.pillar .nh{display:flex;gap:14px;align-items:center}
+.pillar .ico{flex:none;background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--c)}
+.pillar h4{font-size:20px;font-weight:700}
+.pillar .nh p{color:var(--muted);font-size:15.5px}
+.pillar ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px;font-size:16px}
+.hub{margin-top:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:16px 22px;border-radius:14px;background:var(--accent);color:var(--paper)}
+.hub b{font-family:var(--f-display);font-size:22px}
+.hub>span:last-child{opacity:.9}
+.hub-dots{display:flex;margin-right:6px}
+.hub-dots i{width:14px;height:14px;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px var(--paper);margin-right:4px;transform:translateX(calc(var(--k,0)*30px));transition:transform .9s var(--ease-draw) .5s}
+.js .hub:not(.in) .hub-dots i:nth-child(1){--k:-2}.js .hub:not(.in) .hub-dots i:nth-child(3){--k:2}
+
+/* ---------- steps and quote ---------- */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:8px}
+.step .when{font-family:var(--f-mono);font-size:12px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+.step.next{border-style:dashed;border-color:var(--gold)}
+.step.next .when{color:var(--gold)}
+.step h4{font-size:24px}
+.step p{color:var(--muted);font-size:16.5px}
+.quote{font-family:var(--f-display);font-weight:700;font-size:clamp(28px,3.6vw,44px);line-height:1.15;max-width:24ch;padding:56px 0 20px}
+.quote span{color:var(--accent)}
+
+/* ---------- after hours ---------- */
+.papers{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px}
+.papers li{padding-left:14px;border-left:3px solid var(--gold)}
+.papers b{display:block;font-size:16.5px;line-height:1.35}
+.papers span{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+.tools{margin:0;border-top:2px solid var(--ink)}
+.tools>div{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;align-items:baseline;padding:14px 0;border-bottom:1px solid var(--line)}
+.tools dt{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.tools dd{margin:0;display:flex;flex-wrap:wrap;gap:6px}
+.tools dd.plain{font-size:16.5px}
+
+/* ---------- closing and footer ---------- */
+.closing{display:grid;gap:18px;padding-bottom:40px}
+.closing h2{font-size:clamp(36px,5vw,64px);font-weight:800;max-width:18ch}
+.closing p{color:var(--muted);font-size:20px;max-width:60ch}
+.closing .cta-row{margin-top:8px}
+.closing.in>*{animation:rise .8s var(--ease-out) both}
+.closing.in>:nth-child(2){animation-delay:.1s}.closing.in>:nth-child(3){animation-delay:.2s}.closing.in>:nth-child(4){animation-delay:.3s}
+.foot{font-size:14px;color:var(--muted);border-top:1px solid var(--line);padding-top:20px;margin-top:40px;display:grid;gap:14px}
+.sources summary{cursor:pointer;font-weight:600;color:var(--ink);width:fit-content}
+.sources ul{margin:12px 0 4px;padding-left:18px;display:flex;flex-direction:column;gap:6px;max-width:80ch}
+.sources::details-content{height:0;overflow:clip;transition:height .45s var(--ease-out),content-visibility .45s allow-discrete}
+.sources[open]::details-content{height:auto}
+
+/* ---------- responsive ---------- */
+@media (max-width:1100px){
+  .split,.flowdemo,.scene{grid-template-columns:minmax(0,1fr)}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:860px){
+  .grid3,.grid2,.steps{grid-template-columns:minmax(0,1fr)}
+  .pillar{grid-template-columns:minmax(0,1fr);gap:12px}
+  .chapters a{padding:6px 9px}
+  .chapters a .l{display:none}
+  .chapters a .n{font-size:13px;opacity:1}
+  .tools>div{grid-template-columns:minmax(0,1fr);gap:8px}
+  .chapter{padding-top:72px}
+}
+/* on a phone the five steps become a row of numbers, so the steps, the text and the drawing share one screen */
+@media (max-width:700px){
+  .flowdemo .arch svg.flow-wide{display:none}
+  .flowdemo .arch svg.flow-tall{display:block}
+  .flow-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+  .st{display:contents}
+  .st input{inset:auto;width:1px;height:1px}
+  .st .num{width:100%;height:44px;border-radius:12px;font-size:15px}
+  .st .tx{display:none;grid-column:1/-1;grid-row:2;min-height:118px}
+  .st:has(:checked) .tx{display:block}
+  .st .more{height:auto}
+  .st:has(:focus-visible) .num{outline:2px solid var(--accent);outline-offset:3px}
+  .term{font-size:12.5px}
+}
+@media (max-width:560px){
+  body{font-size:17px}
+  .stats{grid-template-columns:minmax(0,1fr)}
+  .brand b span{display:none}
+  .quote{padding-top:40px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+  .flowdemo .pkt{display:none}
+  /* the progress bar reports position, so it stays */
+  .progress i{animation:prog linear both!important;animation-timeline:scroll(root)!important}
+}
+@media print{
+  *,*::before,*::after{animation:none!important}
+  .topbar,.progress,#net,.scroll-cue,.replay{display:none}
+  .room{position:static}
+  .st .more{height:auto}
+}
