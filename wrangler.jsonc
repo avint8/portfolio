@@ -1,0 +1,14 @@
+{
+  "name": "avint8-portfolio",
+  "compatibility_date": "2026-10-11",
+  // Static files only. There is no Worker script, so no request is ever billed:
+  // Cloudflare serves static assets free and without a request limit.
+  "assets": {
+    "directory": "./public",
+    "not_found_handling": "404-page"
+  },
+  "routes": [
+    { "pattern": "avint8.com", "custom_domain": true },
+    { "pattern": "www.avint8.com", "custom_domain": true }
+  ]
+}
