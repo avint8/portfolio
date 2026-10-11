@@ -1,13 +1,15 @@
 /* Portfolio styles. Load tokens.css first.
    The visual language (type, colour, shape, honest labels) is the Story Page design system's.
-   The layout is lighter: a sticky top bar instead of a rail, and one reading column.
-   Content is fully visible without JavaScript. Motion comes from CSS scroll-driven animations
-   where the browser supports them, and everything still reads when it does not. */
+   The page scrolls one section at a time: every section is a snap stop sized to fill the screen,
+   and type and spacing shrink with the window's height so a section's content fits inside it.
+   Content is fully visible without JavaScript, and everything still reads where a newer CSS
+   feature is missing. */
 
 /* ---------- base ---------- */
 *{box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:84px;interpolate-size:allow-keywords}
-body{--gut:clamp(16px,5vw,72px);margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:18px;line-height:1.55;-webkit-font-smoothing:antialiased}
+:root{--bar:calc(57px + env(safe-area-inset-top,0px))}
+html{scroll-behavior:smooth;scroll-padding-top:var(--bar);scroll-snap-type:y mandatory;interpolate-size:allow-keywords}
+body{--gut:clamp(16px,5vw,72px);--pad:clamp(12px,3svh,40px);--screen:calc(100svh - var(--bar));margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:18px;line-height:1.55;-webkit-font-smoothing:antialiased}
 a{color:var(--accent)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
 h1,h2,h3,h4{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.08;letter-spacing:-.01em}
@@ -52,8 +54,15 @@ button{font-family:inherit}
 ::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
 ::view-transition-new(root){z-index:1}
 
-main{min-width:0;padding-inline:var(--gut);padding-bottom:96px}
+main{min-width:0;padding-inline:var(--gut)}
 .col{max-width:1040px;margin-inline:auto}
+
+/* ---------- sections: one per screen ----------
+   Each stop fills the screen below the bar and centres its content, so a snap never lands
+   with half of the next section showing. A stop taller than the screen scrolls freely inside. */
+.hero,.ch-head,.sub,.room,.last{scroll-snap-align:start;scroll-snap-stop:always}
+.ch-head,.sub,.room{min-height:var(--screen);display:flex;flex-direction:column;justify-content:center;padding-block:var(--pad)}
+.chapter{border-top:1px solid var(--line)}
 
 /* ---------- buttons ---------- */
 .btn{display:inline-flex;align-items:center;gap:8px;font:600 16px var(--f-body);text-decoration:none;color:var(--ink);padding:11px 20px;border-radius:999px;border:1px solid var(--line);background:var(--panel);transition:translate .25s var(--ease-out),border-color .25s}
@@ -63,74 +72,73 @@ main{min-width:0;padding-inline:var(--gut);padding-bottom:96px}
 .cta-row{display:flex;flex-wrap:wrap;gap:10px}
 
 /* ---------- hero ---------- */
-.hero{position:relative;isolation:isolate;margin-inline:calc(-1*var(--gut));padding-inline:var(--gut);min-height:min(calc(100svh - 57px),920px);display:grid;align-items:center;overflow:clip}
-/* the canvas reads its two colours from here, so they follow the theme */
-#net{position:absolute;inset:0;width:100%;height:100%;z-index:-1;color:var(--accent);caret-color:var(--muted);-webkit-mask-image:linear-gradient(100deg,transparent 18%,#000 72%);mask-image:linear-gradient(100deg,transparent 18%,#000 72%)}
-.hero-in{width:100%;display:grid;gap:26px;padding-block:clamp(40px,8vh,96px) 64px}
+.hero{position:relative;isolation:isolate;margin-inline:calc(-1*var(--gut));padding-inline:var(--gut);min-height:var(--screen);display:grid;align-items:center;overflow:clip}
+/* The network sits behind every section. The canvas reads its two colours from here, so they follow
+   the theme, and it fades towards the left so it never competes with the text. */
+#net{position:fixed;inset:0;width:100%;height:100lvh;z-index:-1;pointer-events:none;color:var(--accent);caret-color:var(--muted);-webkit-mask-image:linear-gradient(100deg,transparent 18%,#000 72%);mask-image:linear-gradient(100deg,transparent 18%,#000 72%)}
+.hero-in{width:100%;display:grid;gap:clamp(12px,2.8svh,26px);padding-block:clamp(16px,5svh,80px)}
 .eyebrow{font-family:var(--f-mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:600}
-.hero h1{font-size:clamp(44px,7.4vw,96px);font-weight:800;max-width:14ch}
+.hero h1{font-size:clamp(38px,min(7.4vw,12.5svh),96px);font-weight:800;max-width:14ch}
 .hero h1 em{font-style:normal;color:var(--accent)}
 .hero h1 .w{display:inline-block}
-.lede{font-size:clamp(19px,2vw,23px);color:var(--muted);max-width:60ch}
-.hero-meta{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:15px;color:var(--muted)}
-.scroll-cue{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--muted);margin-top:8px}
+.lede{font-size:clamp(16.5px,min(2vw,3svh),23px);color:var(--muted);max-width:60ch}
+.hero-meta{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:15px;color:var(--muted)}
+.scroll-cue{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--muted)}
 .scroll-cue i{width:2px;height:34px;background:linear-gradient(var(--accent),transparent);display:block;animation:cue 1.8s ease-in-out infinite}
 @keyframes cue{0%{transform:scaleY(.3);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}100%{transform:scaleY(.3);transform-origin:bottom}}
 @keyframes word{from{opacity:0;transform:translateY(.45em) rotate(3deg);filter:blur(8px)}}
 @keyframes rise{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
 @keyframes hero-out{to{opacity:0;transform:translateY(-48px) scale(.97)}}
+@keyframes net-dim{to{opacity:.55}}
 @media (prefers-reduced-motion:no-preference){
   .hero h1 .w{animation:word .9s var(--ease-out) both;animation-delay:calc(var(--i)*80ms + .1s)}
   .hero-in>:not(h1){animation:rise .8s var(--ease-out) both;animation-delay:.75s}
   .hero-in>.eyebrow{animation-delay:0s}
   @supports (animation-timeline:scroll()){
     .hero-in>h1{animation:hero-out linear both;animation-timeline:scroll(root);animation-range:18vh 88vh}
-    #net{animation:hero-out linear both;animation-timeline:scroll(root);animation-range:10vh 95vh}
+    #net{animation:net-dim linear both;animation-timeline:scroll(root);animation-range:10vh 95vh}
   }
 }
 
-/* ---------- chapters and sub-sections ---------- */
-.chapter{padding-block:96px 24px;border-top:1px solid var(--line)}
-.ch-head{display:grid;gap:14px;margin-bottom:48px}
-.ch-num{font-family:var(--f-display);font-weight:800;font-size:clamp(64px,9vw,120px);line-height:.9;color:var(--accent-soft);-webkit-text-stroke:1.5px var(--accent);justify-self:start}
-.ch-head h2{font-size:clamp(34px,4.6vw,58px);font-weight:800;max-width:20ch}
-.ch-head p{font-size:20px;color:var(--muted);max-width:62ch}
-.sub{padding-block:40px}
-.sub h3{font-size:clamp(24px,2.6vw,32px);font-weight:700;margin-bottom:12px}
-.sub .sub-lede{color:var(--muted);max-width:64ch;margin-bottom:28px}
+/* ---------- chapter title screens and sub-sections ---------- */
+.ch-head{gap:clamp(10px,2svh,18px)}
+.ch-num{font-family:var(--f-display);font-weight:800;font-size:clamp(72px,min(13vw,21svh),170px);line-height:.9;color:var(--accent-soft);-webkit-text-stroke:1.5px var(--accent);align-self:flex-start}
+.ch-head h2{font-size:clamp(34px,min(5.4vw,9svh),72px);font-weight:800;max-width:18ch}
+.ch-head p{font-size:clamp(17px,min(1.8vw,2.9svh),22px);color:var(--muted);max-width:60ch}
+.sub h3{font-size:clamp(22px,min(2.6vw,4.4svh),32px);font-weight:700;margin-bottom:clamp(6px,1.4svh,12px)}
+.sub .sub-lede{font-size:clamp(16px,min(1.5vw,2.6svh),18px);color:var(--muted);max-width:64ch;margin-bottom:clamp(12px,3svh,28px)}
 .cont-tag{display:inline-flex;align-items:center;gap:8px;font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--c,var(--accent));font-weight:600}
 .cont-tag i{width:8px;height:8px;border-radius:50%;background:var(--c,var(--accent))}
-.note-line{margin-top:14px;color:var(--muted);font-size:15px;max-width:72ch}
+.note-line{margin-top:clamp(8px,1.8svh,14px);color:var(--muted);font-size:15px;max-width:72ch}
 
 /* ---------- reveal ----------
-   Two kinds. Scrubbed reveals (.rv, .stagger) are tied to scroll position by a view timeline and need
-   no script. Timed reveals (.io) get .in from an IntersectionObserver, for things that should play
-   at their own pace: a terminal typing, a checklist ticking. */
+   Scrubbed reveals (.rv, .stagger) are tied to scroll position by a view timeline and need no script.
+   They finish as soon as the element is fully on screen, so a snapped section is never half faded.
+   Timed reveals (.io) get .in from an IntersectionObserver, for things that should play at their
+   own pace: a terminal typing, a checklist ticking. */
 @keyframes slide{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:none}}
 @keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
-@keyframes num-drift{0%{opacity:0;transform:translateY(46px)}22%{opacity:1}100%{opacity:1;transform:translateY(-34px)}}
+@keyframes room-in{from{opacity:.15;transform:scale(.95)}}
 @supports (animation-timeline:view()){
   @media (prefers-reduced-motion:no-preference){
-    .rv{animation:rise linear both;animation-timeline:view();animation-range:entry 0% cover 24%}
-    .stagger>*{animation:rise linear both;animation-timeline:view();animation-range:entry calc(var(--i,0)*6%) cover calc(22% + var(--i,0)*4%)}
-    .ch-head .ch-num{animation:num-drift linear both;animation-timeline:view();animation-range:entry 0% exit 100%}
+    .rv,.stagger>*,.ch-num{animation:rise linear both;animation-timeline:view();animation-range:entry 0% entry 100%}
+    .room-in{animation:room-in linear both;animation-timeline:view();animation-range:entry 0% entry 70%}
   }
 }
 
 /* ---------- grids and cards ---------- */
-.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:10px;min-width:0}
-.card h4{font-size:21px;font-weight:700}
-.card p{color:var(--muted);font-size:16.5px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(10px,2svh,16px)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,2.4svh,20px)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:clamp(14px,2.6svh,22px);display:flex;flex-direction:column;gap:clamp(6px,1.2svh,10px);min-width:0}
+.card h4{font-size:clamp(18px,2.9svh,21px);font-weight:700}
+.card p{color:var(--muted);font-size:clamp(15px,2.2svh,16.5px);line-height:1.45}
 .card .pill{align-self:flex-start;margin-top:auto}
-.card.big{padding:26px;gap:12px}
-.card.big h4{font-size:24px}
+.card.big{padding:clamp(16px,3svh,26px)}
+.card.big h4{font-size:clamp(20px,3.2svh,24px)}
 .accented .card{border-top:4px solid var(--accent)}
 .accented .card .lbl{color:var(--accent)}
 .ico{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}
 .ico svg{width:20px;height:20px}
-.rules{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:15.5px}
 /* a soft light that follows the pointer across a card */
 .spot{position:relative;overflow:hidden;transition:border-color .3s}
 .spot::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(260px circle at var(--mx,50%) var(--my,0%),color-mix(in srgb,var(--accent) 13%,transparent),transparent 70%);opacity:0;transition:opacity .35s}
@@ -159,34 +167,22 @@ main{min-width:0;padding-inline:var(--gut);padding-bottom:96px}
   .gloss{inset:auto;margin:8px 0;position-area:bottom span-right;position-try-fallbacks:flip-inline,flip-block,flip-block flip-inline}
 }
 
-/* ---------- the path: three rooms that stack as they are read ---------- */
-.rooms{display:flex;flex-direction:column;gap:28px;view-timeline:--rooms block}
+/* ---------- the path: one room per screen ---------- */
 .room{container-type:inline-size}
-.room-in{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:32px;align-items:center;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:6px 18px 18px 6px;padding:26px 30px;transform-origin:50% 0}
-.room-copy{display:flex;flex-direction:column;gap:10px;min-width:0}
+.room-in{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:32px;align-items:center;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:6px 18px 18px 6px;padding:clamp(16px,3.4svh,30px) clamp(18px,2.4vw,32px);transform-origin:50% 60%}
+.room-copy{display:flex;flex-direction:column;gap:clamp(6px,1.4svh,10px);min-width:0}
 .room-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px}
-.room h3{font-size:clamp(24px,2.6vw,32px);font-weight:700}
+.room h3{font-size:clamp(22px,min(2.6vw,4.2svh),32px);font-weight:700}
 .when{display:flex;flex-wrap:wrap;gap:0 16px;font-family:var(--f-mono);font-size:12.5px;color:var(--muted);letter-spacing:.03em}
 .when span{white-space:nowrap}
 .when span:first-child{color:var(--ink);font-weight:600}
-.room-copy>p{font-size:16.5px}
-.room ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:16px}
-.stuck{display:flex;flex-direction:column;gap:2px;font-family:var(--f-display);font-weight:700;font-size:22px;line-height:1.2;margin-top:4px}
+.room-copy>p{font-size:clamp(15.5px,2.3svh,16.5px)}
+.room ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:clamp(15px,2.2svh,16px)}
+.stuck{display:flex;flex-direction:column;gap:2px;font-family:var(--f-display);font-weight:700;font-size:clamp(19px,3svh,22px);line-height:1.2;margin-top:4px}
 .stuck .lbl{color:var(--c)}
 .room-vis{min-width:0;display:flex;flex-direction:column;gap:10px}
 @container (width < 780px){
-  .room-in{grid-template-columns:minmax(0,1fr);gap:22px;padding:24px 20px}
-}
-@keyframes room-back{to{transform:scale(calc(1 - (var(--n) - 1 - var(--i))*.035));filter:brightness(calc(1 - (var(--n) - 1 - var(--i))*.035))}}
-/* cards are about 560px tall at this width, so they only stack when the window can hold one */
-@media (min-width:1200px) and (min-height:720px){
-  .room{position:sticky;top:calc(76px + var(--i)*16px)}
-  .room-in{min-height:540px}
-  @supports (animation-timeline:view()){
-    @media (prefers-reduced-motion:no-preference){
-      .room-in{animation:room-back linear both;animation-timeline:--rooms;animation-range:exit-crossing calc(var(--i)/var(--n)*100%) exit-crossing calc((var(--i) + 1)/var(--n)*100%)}
-    }
-  }
+  .room-in{grid-template-columns:minmax(0,1fr);gap:0;padding-block:0}
 }
 
 /* ---------- mock frames shared by the checklist and diagrams ---------- */
@@ -197,7 +193,7 @@ main{min-width:0;padding-inline:var(--gut);padding-bottom:96px}
 /* release checklist */
 .checks{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden}
 .checks-body{padding:12px;display:flex;flex-direction:column;gap:8px}
-.ck{display:grid;grid-template-columns:26px minmax(0,1fr);gap:12px;align-items:start;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.ck{display:grid;grid-template-columns:26px minmax(0,1fr);gap:12px;align-items:start;padding:clamp(7px,1.5svh,10px) 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
 .ck i{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--paper);font-style:normal;font-weight:700;font-size:14px}
 .ck b{display:block;font-size:16px}
 .ck span{color:var(--muted);font-size:14.5px}
@@ -220,7 +216,7 @@ main{min-width:0;padding-inline:var(--gut);padding-bottom:96px}
 
 /* architecture diagrams (inline SVG) */
 .arch{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px;overflow-x:auto}
-.arch svg{display:block;width:100%;min-width:600px;height:auto}
+.arch svg{display:block;width:100%;height:auto}
 .arch .box{fill:var(--paper);stroke:var(--line);stroke-width:1.5}
 .arch .box.hl{fill:var(--accent);stroke:var(--accent)}
 .arch text{font-family:var(--f-body);fill:var(--ink);font-size:15px}
@@ -231,61 +227,62 @@ main{min-width:0;padding-inline:var(--gut);padding-bottom:96px}
 .arch.in .flow{animation:dash 1.2s linear infinite}
 @keyframes dash{to{stroke-dashoffset:-24}}
 .arch.mini{background:var(--paper);border-radius:14px;padding:16px}
-.arch.mini svg{min-width:340px}
+.arch.mini svg{max-height:38svh}
 .arch.mini text.t{font-size:16px}
 .arch.mini text.s{font-size:12px}
 .arch-cap{display:flex;justify-content:space-between;gap:12px;margin-top:10px}
 
 /* ---------- BondScanner: definition and role card ---------- */
 .split{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:40px;align-items:center}
-.big-def{font-family:var(--f-display);font-size:clamp(26px,3vw,36px);font-weight:700;line-height:1.2}
+.big-def{font-family:var(--f-display);font-size:clamp(24px,min(3vw,5svh),36px);font-weight:700;line-height:1.2}
 .big-def mark{background:var(--gold-soft);color:var(--ink);padding:0 .15em;border-radius:4px}
-.def-note{color:var(--muted);margin-top:16px;max-width:56ch}
+.def-note{color:var(--muted);margin-top:16px;max-width:56ch;font-size:clamp(16px,2.5svh,18px)}
 @property --a{syntax:"<angle>";inherits:false;initial-value:0deg}
 @keyframes turn{to{--a:360deg}}
-.idcard{position:relative;isolation:isolate;border-radius:18px;padding:26px;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow)}
+.idcard{position:relative;isolation:isolate;border-radius:18px;padding:clamp(18px,3.4svh,26px);display:flex;flex-direction:column;gap:clamp(10px,1.9svh,14px);box-shadow:var(--shadow)}
 .idcard::before{content:"";position:absolute;inset:-2px;z-index:-2;border-radius:20px;background:conic-gradient(from var(--a),var(--accent),var(--line) 22%,var(--line) 72%,var(--accent));animation:turn 7s linear infinite}
 .idcard::after{content:"";position:absolute;inset:0;z-index:-1;border-radius:18px;background:var(--panel)}
-.idcard h4{font-size:26px;font-weight:800}
-.roles{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.idcard h4{font-size:clamp(22px,3.5svh,26px);font-weight:800}
+.roles{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:clamp(6px,1.4svh,10px)}
 .roles li{display:grid;grid-template-columns:26px minmax(0,1fr);gap:12px;align-items:center}
 .roles i{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-style:normal;font-weight:700;font-size:14px}
 .roles b{font-size:17px;display:block;line-height:1.2}
 .roles span{color:var(--muted);font-size:14.5px}
-.id-foot{display:flex;flex-wrap:wrap;gap:6px;padding-top:14px;border-top:1px solid var(--line)}
+.id-foot{display:flex;flex-wrap:wrap;gap:6px;padding-top:clamp(10px,1.9svh,14px);border-top:1px solid var(--line)}
 
 /* ---------- stats ---------- */
 .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
 .stat{border-top:2px solid var(--ink);padding-top:14px;display:flex;flex-direction:column;gap:6px}
-.stat b{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,4vw,54px);line-height:1;font-variant-numeric:tabular-nums;color:var(--accent);white-space:nowrap}
+.stat b{font-family:var(--f-display);font-weight:800;font-size:clamp(30px,min(4.4vw,8svh),60px);line-height:1;font-variant-numeric:tabular-nums;color:var(--accent);white-space:nowrap}
 .stat>span{font-size:15.5px;color:var(--muted)}
 .stats.in .stat{animation:rise .7s var(--ease-out) both}
 .stats.in .stat:nth-child(2){animation-delay:.1s}.stats.in .stat:nth-child(3){animation-delay:.2s}.stats.in .stat:nth-child(4){animation-delay:.3s}
 
-/* ---------- follow one order: radio steps drive the diagram through :has() ---------- */
-.flowdemo{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.35fr);gap:28px;align-items:start}
-.flow-steps{border:0;margin:0;padding:0;min-width:0;display:flex;flex-direction:column;gap:8px}
-.flow-steps legend{padding:0;margin-bottom:10px}
-.st{position:relative;display:grid;grid-template-columns:30px minmax(0,1fr);gap:12px;align-items:start;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel);cursor:pointer;transition:border-color .25s,background .25s}
+/* ---------- the investment journey: radio steps drive the diagram through :has() ---------- */
+.flowdemo{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.35fr);gap:28px;align-items:center}
+.flow-steps{border:0;margin:0;padding:0;min-width:0;display:flex;flex-direction:column;gap:clamp(5px,1.1svh,8px)}
+.flow-steps legend{padding:0;margin-bottom:8px}
+.st{position:relative;display:grid;grid-template-columns:30px minmax(0,1fr);gap:12px;align-items:start;padding:clamp(6px,1.3svh,10px) 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel);cursor:pointer;transition:border-color .25s,background .25s}
 .st input{position:absolute;inset:0;margin:0;opacity:0;cursor:pointer}
 .st .num{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-family:var(--f-mono);font-weight:700;font-size:13px;transition:background .25s,color .25s}
 .st .tx{min-width:0}
 .st b{display:block;font-size:16.5px;line-height:30px}
+/* every open step is the same height, so the block does not shift as the steps change */
 .st .more{display:block;height:0;overflow:clip;color:var(--muted);font-size:15px;line-height:1.45;transition:height .45s var(--ease-out)}
-.st .more>span{display:block;padding-bottom:4px}
 .st:hover{border-color:color-mix(in srgb,var(--accent) 50%,var(--line))}
 .st:has(:checked){border-color:var(--accent);background:color-mix(in srgb,var(--accent-soft) 50%,var(--panel))}
 .st:has(:checked) .num{background:var(--accent);color:var(--paper)}
-.st:has(:checked) .more{height:auto}
+.st:has(:checked) .more{height:6em}
 .st:has(:focus-visible){outline:2px solid var(--accent);outline-offset:3px}
 @supports not selector(:has(*)){.st .more{height:auto}}
 .flow-stage{min-width:0}
 .flowdemo .arch{padding:16px}
-.flowdemo .arch svg{min-width:520px;max-width:720px;margin-inline:auto}
-.flowdemo .arch svg.flow-tall{display:none;min-width:0;max-width:400px}
+.flowdemo .arch svg{max-width:720px;margin-inline:auto;max-height:46svh}
+.flowdemo .arch svg.flow-tall{display:none;max-width:400px}
 .flowdemo text.t{font-size:15.5px}
 .flowdemo text.h{font-size:18px}
 .flowdemo text.s{font-size:12.5px}
+.flow-tall text.t{font-size:14px}
 .flowdemo .node .box{transition:stroke .35s,fill .35s}
 .flowdemo .edge{stroke:var(--line);stroke-width:2;fill:none;stroke-dasharray:6 6;transition:stroke .35s}
 .flowdemo .pkt{fill:var(--gold);opacity:0;transition:opacity .35s}
@@ -295,8 +292,7 @@ main{min-width:0;padding-inline:var(--gut);padding-bottom:96px}
 .flowdemo:has(#st2:checked) [data-s~="2"],
 .flowdemo:has(#st3:checked) [data-s~="3"],
 .flowdemo:has(#st4:checked) [data-s~="4"],
-.flowdemo:has(#st5:checked) [data-s~="5"],
-.flowdemo:has(#st6:checked) [data-s~="6"]{
+.flowdemo:has(#st5:checked) [data-s~="5"]{
   &.edge{stroke:var(--accent);animation:dash 1.2s linear infinite}
   &.pkt{opacity:1}
   &.node .box{stroke:var(--accent);stroke-width:2.5;fill:var(--accent-soft)}
@@ -304,34 +300,33 @@ main{min-width:0;padding-inline:var(--gut);padding-bottom:96px}
   &.mod text{fill:var(--accent)}
 }
 
-/* ---------- AI at work: a scene with numbered steps beside a chat mock ---------- */
-.scene{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:32px;align-items:start}
-.flow4{display:flex;flex-direction:column;gap:10px}
-.flow4 .f{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+/* ---------- AI at work: numbered steps beside a chat mock ---------- */
+.scene{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:32px;align-items:center}
+.flow4{display:flex;flex-direction:column;gap:clamp(6px,1.3svh,10px)}
+.flow4 .f{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:clamp(7px,1.6svh,12px) 14px}
 .flow4 .n{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-family:var(--f-mono);font-weight:700;font-size:13px}
 .flow4 b{font-size:16px}
-.flow4 p{color:var(--muted);font-size:14.5px}
+.flow4 p{color:var(--muted);font-size:14.5px;line-height:1.4}
 .chat{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;min-width:0}
-.chat-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);font-weight:700;font-size:15px}
+.chat-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:clamp(8px,1.6svh,12px) 16px;border-bottom:1px solid var(--line);font-weight:700;font-size:15px}
 .chat-head .tag{font-family:var(--f-mono);font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
-.chat-body{padding:8px 4px 12px;display:flex;flex-direction:column}
-.msg{display:grid;grid-template-columns:36px minmax(0,1fr);gap:10px;padding:8px 12px}
+.chat-body{padding:clamp(4px,1svh,8px) 4px clamp(8px,1.6svh,12px);display:flex;flex-direction:column}
+.msg{display:grid;grid-template-columns:36px minmax(0,1fr);gap:10px;padding:clamp(5px,1.1svh,8px) 12px}
 .av{width:36px;height:36px;border-radius:9px;display:grid;place-items:center;font-weight:700;font-size:13.5px;color:var(--paper);background:var(--c,var(--muted));font-family:var(--f-display)}
 .av.hl{background:var(--accent)}
 .who{font-weight:700;font-size:15px}
 .who .t{font-weight:400;color:var(--muted);font-size:12.5px;margin-left:6px}
 .who .bot{font-family:var(--f-mono);font-size:10.5px;background:var(--accent-soft);color:var(--accent);padding:1px 5px;border-radius:4px;margin-left:6px;vertical-align:2px}
-.msg p,.msg li{font-size:15.5px;line-height:1.45}
+.msg p,.msg li{font-size:clamp(14.5px,2.3svh,15.5px);line-height:1.42}
 .msg ul{margin:4px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px}
 .msg .meta{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);margin-top:6px}
-.msg .file{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:14px;margin-top:8px;background:var(--paper)}
+.msg .file{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:14px;margin-top:6px;background:var(--paper)}
 .chat.in .msg{animation:msg .55s var(--ease-out) both;animation-delay:calc(var(--i,0)*520ms)}
 @keyframes msg{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.bot-stats{margin-top:32px}
 
 /* ---------- pillars and hub: the three lessons meet ---------- */
-.pillars{display:flex;flex-direction:column;gap:12px}
-.pillar{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) auto;gap:22px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 22px 18px 26px;overflow:hidden}
+.pillars{display:flex;flex-direction:column;gap:clamp(8px,1.7svh,12px)}
+.pillar{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) auto;gap:22px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:clamp(12px,2.4svh,18px) 22px clamp(12px,2.4svh,18px) 26px;overflow:hidden}
 .pillar::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c);transform-origin:top;transition:transform .8s var(--ease-draw);transition-delay:calc(var(--i,0)*120ms + .25s)}
 /* pre-animation states only apply once the script is running, so the page is complete without it */
 .js .pillars:not(.in) .pillar::before{transform:scaleY(0)}
@@ -340,7 +335,7 @@ main{min-width:0;padding-inline:var(--gut);padding-bottom:96px}
 .pillar h4{font-size:20px;font-weight:700}
 .pillar .nh p{color:var(--muted);font-size:15.5px}
 .pillar ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px;font-size:16px}
-.hub{margin-top:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:16px 22px;border-radius:14px;background:var(--accent);color:var(--paper)}
+.hub{margin-top:clamp(10px,2.2svh,18px);display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:clamp(12px,2.2svh,16px) 22px;border-radius:14px;background:var(--accent);color:var(--paper)}
 .hub b{font-family:var(--f-display);font-size:22px}
 .hub>span:last-child{opacity:.9}
 .hub-dots{display:flex;margin-right:6px}
@@ -349,34 +344,37 @@ main{min-width:0;padding-inline:var(--gut);padding-bottom:96px}
 
 /* ---------- steps and quote ---------- */
 .steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.step{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:8px}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:clamp(14px,2.6svh,22px);display:flex;flex-direction:column;gap:8px}
 .step .when{font-family:var(--f-mono);font-size:12px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;font-weight:600}
 .step.next{border-style:dashed;border-color:var(--gold)}
 .step.next .when{color:var(--gold)}
-.step h4{font-size:24px}
-.step p{color:var(--muted);font-size:16.5px}
-.quote{font-family:var(--f-display);font-weight:700;font-size:clamp(28px,3.6vw,44px);line-height:1.15;max-width:24ch;padding:56px 0 20px}
+.step h4{font-size:clamp(20px,3.2svh,24px)}
+.step p{color:var(--muted);font-size:clamp(15px,2.2svh,16.5px)}
+.quote{font-family:var(--f-display);font-weight:700;font-size:clamp(24px,min(3.6vw,5.4svh),44px);line-height:1.15;max-width:24ch;padding:clamp(18px,5svh,56px) 0 0}
 .quote span{color:var(--accent)}
 
 /* ---------- after hours ---------- */
-.papers{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px}
+.papers-wrap{margin-top:clamp(14px,3svh,28px);display:grid;gap:10px}
+.papers{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 24px}
 .papers li{padding-left:14px;border-left:3px solid var(--gold)}
-.papers b{display:block;font-size:16.5px;line-height:1.35}
-.papers span{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+.papers b{display:block;font-size:16px;line-height:1.35}
+.papers span{display:block;color:var(--muted);font-size:14px;margin-top:2px}
 .tools{margin:0;border-top:2px solid var(--ink)}
-.tools>div{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;align-items:baseline;padding:14px 0;border-bottom:1px solid var(--line)}
+.tools>div{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;align-items:baseline;padding:clamp(7px,1.7svh,14px) 0;border-bottom:1px solid var(--line)}
 .tools dt{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
 .tools dd{margin:0;display:flex;flex-wrap:wrap;gap:6px}
 .tools dd.plain{font-size:16.5px}
 
-/* ---------- closing and footer ---------- */
-.closing{display:grid;gap:18px;padding-bottom:40px}
-.closing h2{font-size:clamp(36px,5vw,64px);font-weight:800;max-width:18ch}
-.closing p{color:var(--muted);font-size:20px;max-width:60ch}
+/* ---------- the ask and footer: the last screen ---------- */
+.last{min-height:var(--screen);display:flex;flex-direction:column;padding-block:var(--pad)}
+.closing{display:grid;gap:clamp(10px,2.2svh,18px);margin-block:auto;padding-block:clamp(8px,2svh,24px)}
+.closing .ch-num{font-size:clamp(64px,min(9vw,15svh),120px)}
+.closing h2{font-size:clamp(32px,min(5vw,8.5svh),64px);font-weight:800;max-width:18ch}
+.closing p{color:var(--muted);font-size:clamp(17px,2.9svh,20px);max-width:60ch}
 .closing .cta-row{margin-top:8px}
 .closing.in>*{animation:rise .8s var(--ease-out) both}
 .closing.in>:nth-child(2){animation-delay:.1s}.closing.in>:nth-child(3){animation-delay:.2s}.closing.in>:nth-child(4){animation-delay:.3s}
-.foot{font-size:14px;color:var(--muted);border-top:1px solid var(--line);padding-top:20px;margin-top:40px;display:grid;gap:14px}
+.foot{font-size:14px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px;display:grid;gap:10px}
 .sources summary{cursor:pointer;font-weight:600;color:var(--ink);width:fit-content}
 .sources ul{margin:12px 0 4px;padding-left:18px;display:flex;flex-direction:column;gap:6px;max-width:80ch}
 .sources::details-content{height:0;overflow:clip;transition:height .45s var(--ease-out),content-visibility .45s allow-discrete}
@@ -384,37 +382,87 @@ main{min-width:0;padding-inline:var(--gut);padding-bottom:96px}
 
 /* ---------- responsive ---------- */
 @media (max-width:1100px){
-  .split,.flowdemo,.scene{grid-template-columns:minmax(0,1fr)}
-  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .card{padding:14px}
+  .card p{font-size:15px}
+  .flowdemo,.scene{gap:22px}
 }
+/* Phones and small tablets. Rows of cards become swipeable rows, and the blocks that sat side by side
+   each take a screen of their own, so a section still fits without shrinking the text. */
 @media (max-width:860px){
-  .grid3,.grid2,.steps{grid-template-columns:minmax(0,1fr)}
-  .pillar{grid-template-columns:minmax(0,1fr);gap:12px}
+  .split,.flowdemo,.scene{grid-template-columns:minmax(0,1fr)}
+  .flowdemo{gap:16px}
+  .flowdemo .arch svg{max-width:640px}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .st:has(:checked) .more{height:3em}
   .chapters a{padding:6px 9px}
   .chapters a .l{display:none}
   .chapters a .n{font-size:13px;opacity:1}
-  .tools>div{grid-template-columns:minmax(0,1fr);gap:8px}
-  .chapter{padding-top:72px}
+  .pillar{grid-template-columns:minmax(0,1fr);gap:10px}
+  .tools>div{grid-template-columns:92px minmax(0,1fr);gap:10px}
+  .papers{grid-template-columns:minmax(0,1fr)}
+
+  .swipe{display:flex;flex-direction:row;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none;margin-inline:calc(-1*var(--gut));padding-inline:var(--gut);scroll-padding-inline:var(--gut)}
+  .swipe::-webkit-scrollbar{display:none}
+  .swipe>*{flex:0 0 84%;scroll-snap-align:start;animation:none}
+  /* dots under each row, where the browser draws CSS scroll markers */
+  .swipe{scroll-marker-group:after}
+  .swipe::scroll-marker-group{display:flex;justify-content:center;gap:8px;padding-top:12px}
+  .swipe>*::scroll-marker{content:"";width:8px;height:8px;border-radius:50%;background:var(--line)}
+  .swipe>*::scroll-marker:target-current{background:var(--accent)}
+
+  .sub:has(>.split),.sub:has(>.scene),.room{min-height:0;display:block;padding-block:0}
+  .split,.scene{gap:0}
+  .split>*,.scene-b,.room-copy,.room-vis{min-height:var(--screen);display:flex;flex-direction:column;justify-content:center;padding-block:var(--pad)}
+  .split-b,.scene-b,.room-vis{scroll-snap-align:start;scroll-snap-stop:always}
+  .sub:has(>.scene){padding-top:var(--pad)}
+  .scene>.flow4{padding-bottom:8px}
+  .room-in{border-radius:6px 14px 14px 6px;padding-inline:18px}
+  .room-copy{gap:6px}
+  .papers b{font-size:15px}
 }
-/* on a phone the five steps become a row of numbers, so the steps, the text and the drawing share one screen */
+/* short phones: the bot's five steps become a swipeable row, and text tightens a little */
+@media (max-width:860px) and (max-height:700px){
+  .flow4{flex-direction:row;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none;margin-inline:calc(-1*var(--gut));padding-inline:var(--gut);scroll-padding-inline:var(--gut);scroll-marker-group:after}
+  .flow4::-webkit-scrollbar{display:none}
+  .flow4>*{flex:0 0 84%;scroll-snap-align:start;animation:none}
+  .flow4::scroll-marker-group{display:flex;justify-content:center;gap:8px;padding-top:12px}
+  .flow4>*::scroll-marker{content:"";width:8px;height:8px;border-radius:50%;background:var(--line)}
+  .flow4>*::scroll-marker:target-current{background:var(--accent)}
+  .room h3{font-size:21px}
+  .room-copy{gap:4px}
+  .room-copy>p{font-size:15px;line-height:1.45}
+  .room ul{font-size:14.5px;line-height:1.4;gap:2px}
+  .stuck{font-size:18px}
+  .tools>div{padding-block:6px}
+}
 @media (max-width:700px){
+  .wide{display:none}
+  .flowdemo .arch{padding:10px}
   .flowdemo .arch svg.flow-wide{display:none}
-  .flowdemo .arch svg.flow-tall{display:block}
+  .flowdemo .arch svg.flow-tall{display:block;max-height:max(180px,calc(var(--screen) - 412px))}
   .flow-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
   .st{display:contents}
   .st input{inset:auto;width:1px;height:1px}
-  .st .num{width:100%;height:44px;border-radius:12px;font-size:15px}
-  .st .tx{display:none;grid-column:1/-1;grid-row:2;min-height:118px}
+  .st .num{width:100%;height:42px;border-radius:12px;font-size:15px}
+  .st .tx{display:none;grid-column:1/-1;grid-row:2;min-height:96px}
   .st:has(:checked) .tx{display:block}
-  .st .more{height:auto}
+  .st .more,.st:has(:checked) .more{height:auto}
   .st:has(:focus-visible) .num{outline:2px solid var(--accent);outline-offset:3px}
   .term{font-size:12.5px}
 }
 @media (max-width:560px){
   body{font-size:17px}
-  .stats{grid-template-columns:minmax(0,1fr)}
   .brand b span{display:none}
-  .quote{padding-top:40px}
+  .room .chips{display:none}
+  .stat b{font-size:clamp(28px,8.4vw,40px)}
+  .stat>span{font-size:14.5px}
+}
+/* very short windows cannot hold a section, so snapping only nudges */
+@media (max-height:520px){
+  html{scroll-snap-type:y proximity}
+}
+@media (max-height:700px){
+  .scroll-cue{display:none}
 }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
@@ -424,8 +472,9 @@ main{min-width:0;padding-inline:var(--gut);padding-bottom:96px}
   .progress i{animation:prog linear both!important;animation-timeline:scroll(root)!important}
 }
 @media print{
+  html{scroll-snap-type:none}
   *,*::before,*::after{animation:none!important}
   .topbar,.progress,#net,.scroll-cue,.replay{display:none}
-  .room{position:static}
+  .hero,.ch-head,.sub,.room,.last,.split>*,.scene-b,.room-copy,.room-vis{min-height:0}
   .st .more{height:auto}
 }

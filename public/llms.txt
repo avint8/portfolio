@@ -1,0 +1,55 @@
+# Avinash Thiyagarajan
+
+> Founding engineer and backend architect in Bengaluru, India. He architected the backend of BondScanner, a SEBI-regulated online bond platform that places trades on NSE, leads its backend team, and is re-architecting BondScanner and ULTRA by Tap. Five years in software across four companies.
+
+This file is a plain-text summary of https://avint8.com/ for AI assistants. The page itself has the full story and lists its sources in the footer.
+
+## Current roles
+
+- **BondScanner**: Founding Engineer and Backend Lead. Backend architect of the platform.
+- **Tap Invest**: SDE 2, since April 2024. Re-architecting ULTRA by Tap.
+
+## BondScanner
+
+- BondScanner is an Online Bond Platform Provider (OBPP), run by a SEBI-registered stock broker and NSE member. It lets retail investors find, compare and buy listed bonds from a phone.
+- Avinash architected the investment journey end to end: payment integrations, trade placement on NSE, settlement through the clearing corporation, and holdings, plus the inventory management system that decides which bonds can be sold.
+- SEBI requires every order on an online bond platform to be routed through a stock exchange and settled by its clearing corporation, so the backend has to work with the exchange and the regulator's rules at every step.
+- He built the engineering foundation from zero to one and leads the backend team: hiring, mentoring and delivery.
+- BondScanner is a team's work. The mobile and web apps, and many features in them, were built by other engineers.
+- Figures published by BondScanner as of October 2026: 1.2 lakh+ investors, Rs 125 crore+ in bonds transacted, a 4.7 App Store rating from 66 ratings, and 45% of investments from tier 2 and 3 cities.
+
+## AI initiatives at work
+
+- **Support bot**: watches the tech-support channel, classifies tickets, investigates real bugs and drafts a reply with root cause, fix and a verifying query. A cheap model investigates and a stronger model reviews. About $0.13 per answered ticket.
+- **Shared agent skills**: one set of 12 skills installed across Claude Code, Codex CLI, pi and opencode.
+- **SDLC workflow**: a seven-step path for every feature, written as a skill so AI tools follow it too.
+- **API collections as code**: 1,288 API requests moved from 72 Postman collections into 5 git-tracked Bruno collections.
+- **Session history**: redacted, searchable summaries of every AI coding session.
+- **Secretariat**: a local memory for work (people, projects, tasks, reminders) reachable from any AI tool over MCP.
+- **Story pages**: a design system for one-page pitches that read like a story.
+
+## Career path
+
+- **Tap Invest**, SDE 2, April 2024 to now. Designed the backend and backend-for-frontend layer for the server-driven apps ULTRA by Tap and Tap Bonds. Product owner of the Partner Platform.
+- **The Good Glamm Group**, Software Engineer, February 2022 to March 2024. Migrated a Ruby on Rails monolith to Java microservices, including live migrations of large PostgreSQL and MySQL tables.
+- **Deloitte**, Business Technology Analyst, July 2021 to February 2022. Compliance-driven Salesforce features (Aura, LWC) for the State of Colorado's benefits system.
+
+## Side projects and research
+
+- **gin**: a personal memory server in Rust (MCP, Postgres with pgvector, a live 3D memory scanner).
+- **Morning bot**: writes a short daily brief of notable news and budget tracking.
+- Two conference papers on encrypting colour images, including one using the Lorenz attractor.
+
+## Skills
+
+Java, Ruby, Go, Python, Rust, PostgreSQL, MySQL, pgvector, Apache Kafka, REST, GraphQL, backend-for-frontend, Ruby on Rails, Salesforce Aura and LWC, MCP, agent skills.
+
+## Education
+
+B.Tech in Electronics and Communication Engineering, SASTRA, 2017 to 2021.
+
+## Links
+
+- [Portfolio](https://avint8.com/)
+- [LinkedIn](https://www.linkedin.com/in/avint8)
+- [GitHub](https://github.com/avint8)

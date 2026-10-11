@@ -61,18 +61,18 @@
   window.addEventListener('resize', spy);
   spy();
 
-  /* ---------- hero canvas: a small network that wires itself to the pointer ---------- */
+  /* ---------- background canvas: a small network that wires itself to the pointer ---------- */
   var net = (function(){
     var cv = document.getElementById('net');
     if (!cv || !cv.getContext) return {recolour:function(){}};
-    var ctx = cv.getContext('2d'), hero = cv.parentElement;
-    var W = 0, H = 0, nodes = [], ptr = {x:-1e4, y:-1e4}, cA = '', cM = '', raf = 0, seen = true;
+    var ctx = cv.getContext('2d');
+    var W = 0, H = 0, nodes = [], ptr = {x:-1e4, y:-1e4}, cA = '', cM = '', raf = 0;
     var LINK = 150, REACH = 220;
     function colours(){ var s = getComputedStyle(cv); cA = s.color; cM = s.caretColor; }
     function mk(){ return {x:Math.random()*W, y:Math.random()*H, vx:(Math.random()-.5)*.3, vy:(Math.random()-.5)*.3, r:1.4+Math.random()*1.6}; }
     function size(){
       var d = Math.min(window.devicePixelRatio || 1, 2);
-      W = hero.clientWidth; H = hero.clientHeight;
+      W = cv.clientWidth; H = cv.clientHeight;
       cv.width = Math.round(W*d); cv.height = Math.round(H*d); ctx.setTransform(d,0,0,d,0,0);
       var n = Math.max(18, Math.min(72, Math.round(W*H/17000)));
       while (nodes.length < n) nodes.push(mk());
@@ -118,12 +118,12 @@
       if (on && !raf) raf = requestAnimationFrame(loop);
       if (!on && raf){ cancelAnimationFrame(raf); raf = 0; }
     }
-    hero.addEventListener('pointermove', function(e){ var r = hero.getBoundingClientRect(); ptr.x = e.clientX - r.left; ptr.y = e.clientY - r.top; });
-    hero.addEventListener('pointerleave', function(){ ptr.x = ptr.y = -1e4; });
+    /* the canvas is fixed behind the whole page, so the pointer is tracked across the window */
+    window.addEventListener('pointermove', function(e){ ptr.x = e.clientX; ptr.y = e.clientY; }, {passive:true});
+    document.documentElement.addEventListener('pointerleave', function(){ ptr.x = ptr.y = -1e4; });
     colours(); size();
-    if ('ResizeObserver' in window) new ResizeObserver(size).observe(hero); else window.addEventListener('resize', size);
-    if ('IntersectionObserver' in window) new IntersectionObserver(function(es){ seen = es[0].isIntersecting; play(seen && !document.hidden); }).observe(hero);
-    document.addEventListener('visibilitychange', function(){ play(seen && !document.hidden); });
+    if ('ResizeObserver' in window) new ResizeObserver(size).observe(cv); else window.addEventListener('resize', size);
+    document.addEventListener('visibilitychange', function(){ play(!document.hidden); });
     play(true);
     return {recolour:function(){ colours(); if (!raf) frame(); }};
   })();
@@ -173,26 +173,58 @@
     new IntersectionObserver(function(es){ auto(es[0].isIntersecting); }, {threshold:0.4}).observe(demo);
   }
 
-  /* ---------- J / K step through the page one block at a time ---------- */
+  /* ---------- one section per scroll ----------
+     Touch scrolling is handled by CSS scroll snap alone. A mouse wheel moves too little per notch for
+     snap to carry it to the next section, so the wheel and the keyboard page through the stops here.
+     Inside a section taller than the screen everything scrolls normally until its edge is reached. */
+  function barHeight(){ return parseFloat(getComputedStyle(root).scrollPaddingTop) || 0; }
+  /* the stops are whatever the stylesheet made a snap point at this screen size */
   function stops(){
-    var ys = [0];
-    document.querySelectorAll('.ch-head,.sub,.closing').forEach(function(el){ ys.push(pageTop(el) - 84); });
-    /* rooms are sticky, so their stops come from where each one would sit in normal flow */
-    var rooms = document.querySelector('.rooms');
-    if (rooms){
-      var y = pageTop(rooms);
-      Array.prototype.forEach.call(rooms.children, function(r, i){ ys.push(y - 76 - i*16); y += r.offsetHeight + 28; });
-    }
+    var bar = barHeight(), ys = [];
+    document.querySelectorAll('.hero,.ch-head,.sub,.room,.last,.split-b,.scene-b,.room-vis').forEach(function(el){
+      if (getComputedStyle(el).scrollSnapAlign !== 'none') ys.push(Math.max(0, Math.round(pageTop(el) - bar)));
+    });
     return ys.sort(function(a, b){ return a - b; });
   }
+  /* move one stop in the given direction; false means "let the browser scroll" */
+  function page(dir){
+    var ys = stops(), y = window.scrollY, screen = window.innerHeight - barHeight(), i = 0, k, to;
+    for (k = 0; k < ys.length; k++) if (ys[k] <= y + 2) i = k;
+    if (dir > 0){
+      if (i >= ys.length - 1) return false;
+      if (ys[i + 1] - y > screen + 4) return false;
+      to = ys[i + 1];
+    } else if (y - ys[i] > 4){
+      if (y - ys[i] > screen) return false;
+      to = ys[i];
+    } else {
+      if (i === 0) return false;
+      to = Math.max(ys[i - 1], ys[i] - screen);
+    }
+    window.scrollTo({top:to, behavior: reduce ? 'auto' : 'smooth'});
+    return true;
+  }
+
+  /* a wheel gesture is a run of events; it turns one page, and its tail is swallowed */
+  var turnedAt = 0, lastWheel = 0;
+  window.addEventListener('wheel', function(e){
+    if (e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY) || !e.deltaY) return;
+    if (window.innerHeight <= 520) return;
+    var now = performance.now(), sameGesture = now - lastWheel < 140, settling = now - turnedAt < 450;
+    lastWheel = now;
+    if (turnedAt && (settling || sameGesture)){ e.preventDefault(); return; }
+    if (page(e.deltaY > 0 ? 1 : -1)){ e.preventDefault(); turnedAt = now; }
+    else turnedAt = 0;
+  }, {passive:false});
+
   document.addEventListener('keydown', function(e){
-    if (e.metaKey || e.ctrlKey || e.altKey || /input|textarea|select/i.test(e.target.tagName)) return;
-    var k = e.key.toLowerCase();
-    if (k !== 'j' && k !== 'k') return;
-    e.preventDefault();
-    var ys = stops(), y = window.scrollY, to = null, i;
-    if (k === 'j'){ for (i = 0; i < ys.length; i++) if (ys[i] > y + 8){ to = ys[i]; break; } }
-    else { for (i = ys.length - 1; i >= 0; i--) if (ys[i] < y - 8){ to = ys[i]; break; } }
-    if (to !== null) window.scrollTo({top:Math.max(0, to), behavior: reduce ? 'auto' : 'smooth'});
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var t = e.target, k = e.key, dir = 0;
+    if (t.closest && t.closest('input,textarea,select,[contenteditable]')) return;
+    /* Space presses a focused button, so it only pages from elsewhere */
+    if (k === ' ' && t.closest && t.closest('button,summary')) return;
+    if (k === 'j' || k === 'J' || k === 'ArrowDown' || k === 'PageDown' || (k === ' ' && !e.shiftKey)) dir = 1;
+    else if (k === 'k' || k === 'K' || k === 'ArrowUp' || k === 'PageUp' || (k === ' ' && e.shiftKey)) dir = -1;
+    if (dir && page(dir)) e.preventDefault();
   });
 })();
