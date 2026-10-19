@@ -1,0 +1,70 @@
+/* Tokens, taken from the Story Page design language.
+   Every colour, font and shadow on the page comes from this file. Components never use raw hex values,
+   with one exception: the syntax colours inside .term, which stay the same in both themes.
+
+   The first block is the light theme, for browsers without light-dark().
+   The second block declares both themes at once; the theme toggle only flips color-scheme. */
+
+:root{
+  color-scheme:light;
+
+  /* surfaces and text */
+  --paper:#F1F4F2;        /* page background */
+  --panel:#FBFCFA;        /* cards, mocks, diagram frames */
+  --ink:#12221F;          /* body text, headings, strong rules */
+  --muted:#56696A;        /* secondary text, labels, captions */
+  --line:#D3DCD8;         /* hairlines, borders, dividers */
+
+  /* meaning */
+  --accent:#1B6B57;       /* the subject of the story: links, live, the highlighted box */
+  --accent-soft:#DCEBE4;  /* tint behind accent text */
+  --gold:#9A6516;         /* in progress, illustrative, highlight marks */
+  --gold-soft:#F4E6CB;
+  --risk:#A9432E;
+  --risk-soft:#F6E1DA;
+
+  /* terminal mock (dark in both themes) */
+  --term:#0E1C1B; --term-fg:#D5E5E0; --term-dim:#7F9792; --term-ok:#63D1A8;
+
+  /* series palette: one per room in the story */
+  --p1:#2D64C8; --p2:#1B6B57; --p3:#7448BC; --p4:#A9432E; --p5:#9A6516; --p6:#0B7F8F; --p7:#B0397A;
+
+  --shadow:0 1px 2px rgb(18 34 31/.06),0 8px 24px rgb(18 34 31/.06);
+
+  --f-display:'Bricolage Grotesque','Avenir Next','Segoe UI',sans-serif;
+  --f-body:'Source Sans 3','Segoe UI',Helvetica,Arial,sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+
+  /* motion */
+  --ease-out:cubic-bezier(.2,.7,.2,1);   /* every entrance */
+  --ease-draw:cubic-bezier(.3,.7,.2,1);  /* edges and lines that draw themselves */
+  --ease-spring:linear(0,.009,.035 2.1%,.141,.281 6.7%,.723 12.9%,.938 16.7%,1.017,1.077,1.121,1.149 24.3%,1.159,1.163,1.161,1.154 29.9%,1.129 32.8%,1.051 39.6%,1.017 43.1%,.991,.977 51%,.974 53.8%,.975 57.1%,.997 69.8%,1.003 76.9%,1.004 83.8%,1);
+}
+
+@supports (color:light-dark(#000,#fff)){
+  :root{
+    color-scheme:light dark;
+    --paper:light-dark(#F1F4F2,#0C1716);
+    --panel:light-dark(#FBFCFA,#132321);
+    --ink:light-dark(#12221F,#E4EEEA);
+    --muted:light-dark(#56696A,#93A8A3);
+    --line:light-dark(#D3DCD8,#26403B);
+    --accent:light-dark(#1B6B57,#5CC9A5);
+    --accent-soft:light-dark(#DCEBE4,#173A31);
+    --gold:light-dark(#9A6516,#E9B657);
+    --gold-soft:light-dark(#F4E6CB,#3A2E17);
+    --risk:light-dark(#A9432E,#EE8A72);
+    --risk-soft:light-dark(#F6E1DA,#3D221B);
+    --term:light-dark(#0E1C1B,#07100F);
+    --p1:light-dark(#2D64C8,#7DA6F2);
+    --p2:light-dark(#1B6B57,#5CC9A5);
+    --p3:light-dark(#7448BC,#B497EE);
+    --p4:light-dark(#A9432E,#EE8A72);
+    --p5:light-dark(#9A6516,#E9B657);
+    --p6:light-dark(#0B7F8F,#5FC6D3);
+    --p7:light-dark(#B0397A,#EE8CC2);
+    --shadow:0 1px 2px light-dark(rgb(18 34 31/.06),rgb(0 0 0/.3)),0 8px 24px light-dark(rgb(18 34 31/.06),rgb(0 0 0/.3));
+  }
+  :root[data-theme="light"]{color-scheme:light}
+  :root[data-theme="dark"]{color-scheme:dark}
+}

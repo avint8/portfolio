@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Styles · Avinash Thiyagarajan</title>
+<meta name="description" content="The same portfolio drawn in different art styles.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Antique&family=Shippori+Mincho:wght@400;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+  :root{--paper:#F4F1EA;--ink:#000;color-scheme:light}
+  @media (prefers-color-scheme:dark){:root{--paper:#000;--ink:#FFF;color-scheme:dark}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:"Shippori Mincho",Georgia,serif;line-height:1.5}
+  main{max-width:1240px;margin:0 auto;padding:48px 16px 64px}
+  h1{font-family:"Zen Antique",serif;font-weight:400;font-size:clamp(2.2rem,6vw,4rem);line-height:1.05;margin:0 0 8px}
+  .lede{max-width:60ch;margin:0 0 36px}
+  .mono{font-family:"IBM Plex Mono",monospace;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
+  a.card{display:flex;flex-direction:column;color:inherit;text-decoration:none;border:2px solid var(--ink);background:var(--paper)}
+  a.card.cur{border-width:4px}
+  a.card:hover,a.card:focus-visible{outline:3px solid var(--ink);outline-offset:4px}
+  .shot{position:relative;aspect-ratio:16/10;overflow:hidden;border-bottom:2px solid var(--ink)}
+  .shot iframe{position:absolute;top:0;left:0;width:1280px;height:800px;border:0;transform-origin:0 0;pointer-events:none}
+  .txt{padding:16px 18px 20px}
+  .txt h2{font-family:"Zen Antique",serif;font-weight:400;font-size:1.7rem;margin:4px 0 6px}
+  .txt p{margin:0}
+  .back{display:inline-block;margin-top:32px;color:inherit}
+</style>
+</head>
+<body>
+<main>
+  <p class="mono">avint8.com / styles</p>
+  <h1>One portfolio, several styles</h1>
+  <p class="lede">The same story drawn in different art styles. Ukiyo-e is the one on the main site; the others are kept here to compare and share.</p>
+  <div class="grid">
+    <a class="card cur" href="ukiyoe/">
+      <div class="shot"><iframe src="ukiyoe/" title="Ukiyo-e style preview" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="txt"><span class="mono">Current · on avint8.com</span><h2>Ukiyo-e</h2><p>Woodblock print. Carved lines, wave patterns, title cartouches and a wooden board.</p></div>
+    </a>
+    <a class="card" href="sumi/">
+      <div class="shot"><iframe src="sumi/" title="Sumi style preview" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="txt"><span class="mono">Ink</span><h2>Sumi</h2><p>Calligraphy and ink wash. Calm washi paper, soft brush strokes and dot tones.</p></div>
+    </a>
+    <a class="card" href="shonen/">
+      <div class="shot"><iframe src="shonen/" title="Shōnen style preview" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="txt"><span class="mono">Manga</span><h2>Shōnen</h2><p>Loud action manga. Thick panels, bold type, speed lines and sound effects.</p></div>
+    </a>
+    <a class="card" href="typewriter/">
+      <div class="shot"><iframe src="typewriter/" title="Typewriter style preview" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="txt"><span class="mono">Typed</span><h2>Typewriter</h2><p>Typed on a manual typewriter. Crisp mono type, typed tables and art made from typed characters.</p></div>
+    </a>
+    <a class="card" href="pixel/">
+      <div class="shot"><iframe src="pixel/" title="E-ink pixel style preview" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="txt"><span class="mono">Pixel</span><h2>E-ink pixel</h2><p>An e-reader showing 16-bit pixel art. Crisp 1-bit pixels, dithered greys and slow refreshes.</p></div>
+    </a>
+    <a class="card" href="original/">
+      <div class="shot"><iframe src="original/" title="Original story page preview" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="txt"><span class="mono">Before the redesign</span><h2>Original</h2><p>The colourful story page that ran on avint8.com before the ink redesign.</p></div>
+    </a>
+  </div>
+  <a class="back mono" href="../">← Back to avint8.com</a>
+</main>
+<script>
+  // Scale each 1280×800 preview down to its card width.
+  const fit = () => document.querySelectorAll('.shot').forEach(s => {
+    s.querySelector('iframe').style.transform = `scale(${s.clientWidth / 1280})`;
+  });
+  addEventListener('resize', fit); fit();
+</script>
+</body>
+</html>

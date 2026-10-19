@@ -1,0 +1,2 @@
+/style /styles/ 301
+/style/* /styles/:splat 301
