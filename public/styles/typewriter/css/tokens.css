@@ -1,0 +1,22 @@
+/* Tokens. Two colours only: --paper and --ink. Everything on the page is ink typed on paper.
+   "Grey" never exists as a colour: shadows, ruled lines and faint edges are the same ink at low opacity.
+   Light: off-white typing paper with black ink.  Dark: pure black paper (AMOLED) with pure white ink.
+   The theme switch swaps these two values and nothing else. */
+
+:root{
+  color-scheme:light;
+  --paper:#F4F1EA;
+  --ink:#000;
+
+  /* Courier Prime: a clean, crisp typewriter face. IBM Plex Mono for the very small labels. */
+  --f-body:'Courier Prime','Courier New',Courier,monospace;
+  --f-head:'Courier Prime','Courier New',Courier,monospace;
+  --f-mono:'IBM Plex Mono','Courier Prime',ui-monospace,Menlo,Consolas,monospace;
+
+  --ease-out:cubic-bezier(.2,.7,.2,1);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){color-scheme:dark;--paper:#000;--ink:#fff}
+}
+:root[data-theme="dark"]{color-scheme:dark;--paper:#000;--ink:#fff}
+:root[data-theme="light"]{color-scheme:light}

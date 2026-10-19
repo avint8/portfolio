@@ -1,0 +1,28 @@
+/* Tokens. Two colours only: --paper and --ink. Everything on the page is ink on paper.
+   "Grey" never exists as a colour; it is made from pattern density (screentone, hatching, stipple).
+   Light: off-white washi with a fine grain.  Dark: pure black paper (AMOLED), pure white ink, no texture.
+   The theme switch swaps these two values and nothing else. */
+
+:root{
+  color-scheme:light;
+  --paper:#F4F1EA;
+  --ink:#000;
+  /* paper grain is a texture, not a colour: it is ink at very low alpha, and absent in the dark theme */
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='g' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.3 0 0 0 -.55'/%3E%3C/filter%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012 .6' numOctaves='2' seed='9'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.6 0 0 0 -.8'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23g)' opacity='.20'/%3E%3Crect width='240' height='240' filter='url(%23f)' opacity='.16'/%3E%3C/svg%3E");
+
+  --f-brush:'Yuji Boku','Yuji Syuku','Hiragino Mincho ProN','Yu Mincho',serif;
+  --f-sfx:'Dela Gothic One','Arial Black',Impact,sans-serif;
+  --f-out:'Rampart One','Dela Gothic One',Impact,sans-serif;
+  --f-wet:'Rubik Wet Paint','Dela Gothic One',Impact,sans-serif;
+  --f-note:'Yusei Magic','Segoe Print','Comic Sans MS',cursive;
+  --f-body:'Shippori Mincho','Hiragino Mincho ProN','Yu Mincho',Georgia,serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+
+  --ease-out:cubic-bezier(.2,.7,.2,1);
+  --dry:cubic-bezier(.3,.6,.2,1);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){color-scheme:dark;--paper:#000;--ink:#fff;--grain:none}
+}
+:root[data-theme="dark"]{color-scheme:dark;--paper:#000;--ink:#fff;--grain:none}
+:root[data-theme="light"]{color-scheme:light}

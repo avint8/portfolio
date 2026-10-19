@@ -30,12 +30,13 @@
 <meta name="twitter:title" content="Avinash Thiyagarajan · Founding Engineer and Backend Architect">
 <meta name="twitter:description" content="I build backends from zero to one. Founding engineer and backend architect of BondScanner, a SEBI-regulated bond platform that trades on NSE.">
 <meta name="twitter:image" content="https://avint8.com/og.png">
-<meta name="theme-color" content="#F1F4F2" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0C1716" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F4F1EA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Antique&text=%20!%22%23%24%25%26'()*%2B%2C-.%2F0123456789%3A%3B%3C%3D%3E%3F%40ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~%C3%97%E2%82%B9%E2%86%92%E2%86%93%E2%86%97%E2%80%99%C2%B7&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
 <link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/site.css">
 <script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
@@ -90,11 +91,32 @@
 </head>
 <body>
 
-<canvas id="net" aria-hidden="true"></canvas>
-<div class="progress" aria-hidden="true"><i id="prog"></i></div>
+<svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">
+  <defs>
+    <!-- the one shared edge filter: block-carved lines, straight but slightly chipped -->
+    <filter id="inkwobble" x="-3%" y="-3%" width="106%" height="106%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.07 0.09" numOctaves="3" seed="8" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <!-- transition masks; their paths are written by site.js -->
+    <clipPath id="brushClip" clipPathUnits="userSpaceOnUse"><path id="brushClipP" d="M0 0"/></clipPath>
+    <clipPath id="brushRing" clipPathUnits="userSpaceOnUse"><path id="brushRingP" d="M0 0"/></clipPath>
+    <clipPath id="tearPoster" clipPathUnits="objectBoundingBox"><path id="tearPosterP" d="M0 0H1V1H0Z"/></clipPath>
+    <clipPath id="tearScrap" clipPathUnits="objectBoundingBox"><path id="tearScrapP" d="M0 0H1V1H0Z"/></clipPath>
+    <pattern id="tonedots" width="5" height="5" patternUnits="userSpaceOnUse"><circle cx="2.5" cy="2.5" r="1.05" class="ink-fill"/></pattern>
+  </defs>
+</svg>
+
+<canvas id="trail" aria-hidden="true"></canvas>
+<div class="brush" id="brush" aria-hidden="true"></div>
+<div class="counter" id="counter" aria-hidden="true"><b id="cn">1</b> / <span id="ct">1</span></div>
+<div class="keys" role="group" aria-label="Step through the page">
+  <button class="key" type="button" id="keyK" data-step="-1" aria-label="Previous section (K)"><b>K</b><span aria-hidden="true">↑</span></button>
+  <button class="key" type="button" id="keyJ" data-step="1" aria-label="Next section (J)"><b>J</b><span aria-hidden="true">↓</span></button>
+</div>
 
 <header class="topbar">
-  <a class="brand" href="#top" aria-label="Avinash Thiyagarajan, back to top"><span class="dot">A</span><b>Avinash<span> Thiyagarajan</span></b></a>
+  <a class="brand" href="#top" aria-label="Avinash Thiyagarajan, back to top"><b>Avinash<span> Thiyagarajan</span></b></a>
   <nav class="chapters" id="toc" aria-label="Chapters">
     <a href="#ch1"><span class="n">01</span><span class="l">BondScanner</span></a>
     <a href="#ch2"><span class="n">02</span><span class="l">AI at work</span></a>
@@ -103,34 +125,41 @@
     <a href="#ch5"><span class="n">05</span><span class="l">The ask</span></a>
   </nav>
   <button class="theme-btn" id="themeBtn" type="button" aria-label="Switch between light and dark">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16z" fill="currentColor"/></svg>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path class="drop" d="M12 2.5c3.2 4.3 6.2 7.6 6.2 11.3a6.2 6.2 0 0 1-12.4 0C5.8 10.1 8.8 6.8 12 2.5z"/><path class="gloss-d" d="M9 14.2a3.2 3.2 0 0 0 2.6 3.1"/></svg>
   </button>
 </header>
 
 <main>
-
-<!-- ============ HERO ============ -->
-<header class="hero" id="top">
-  <div class="col hero-in">
-    <p class="eyebrow">Avinash Thiyagarajan · Bengaluru</p>
-    <h1><span class="w" style="--i:0">I</span> <span class="w" style="--i:1">build</span> <span class="w" style="--i:2">backends</span> <span class="w" style="--i:3">from</span> <span class="w" style="--i:4"><em>zero</em></span> <span class="w" style="--i:5">to</span> <span class="w" style="--i:6">one.</span></h1>
-    <p class="lede">Five years, four companies, each one closer to the foundation. Today I am the backend architect and founding engineer behind BondScanner, a SEBI-regulated bond platform that trades on NSE. I lead its backend team, and I am re-architecting it alongside ULTRA by Tap. <span class="wide">This is that story in five short parts.</span></p>
-    <div class="hero-meta"><span>5 years in software</span><span>4 companies</span><span>2 platforms being re-architected</span><span>About 5 minutes</span></div>
-    <div class="cta-row">
-      <a class="btn primary" href="#ch1">Read the story <span aria-hidden="true">↓</span></a>
-      <a class="btn" href="#ch4">How I got here</a>
-    </div>
-    <div class="scroll-cue"><i></i>Scroll to begin</div>
-  </div>
-</header>
-
-<div class="col">
-
-<!-- ============ 01 BONDSCANNER ============ -->
 <section class="chapter" id="ch1">
-  <div class="ch-head"><span class="ch-num">01</span><h2 class="rv">I got to start from zero</h2><p class="rv">BondScanner is an online bond platform, regulated by SEBI, that places every trade on NSE. I am its founding engineer and backend architect, and I lead the backend team.</p></div>
-
-  <div class="sub" id="bs-what">
+  <!-- hero -> ch1: the giant brush stroke -->
+  <div class="trans tr-brush" id="tx1" data-tx="brush">
+    <div class="stage">
+      <header class="lyr hero t-a pn" id="top">
+        <div class="hero-in">
+          <p class="eyebrow">Founding Engineer and Backend Architect · Bengaluru</p>
+          <h1 class="name"><span>Avinash</span> <span>Thiyagarajan</span></h1>
+          <p class="tagline">I build backends from <span class="wet">zero</span> to one.</p>
+          <p class="lede">Five years, four companies, each one closer to the foundation. Today I am the backend architect and founding engineer behind BondScanner, a SEBI-regulated bond platform that trades on NSE. I lead its backend team, and I am re-architecting it alongside ULTRA by Tap. <span class="wide">This is that story in five short parts.</span></p>
+          <div class="hero-meta"><span>5 years in software</span><span>4 companies</span><span>2 platforms being re-architected</span><span>About 5 minutes</span></div>
+          <div class="cta-row">
+            <a class="btn primary" href="#ch1">Read the story <span aria-hidden="true">↓</span></a>
+            <a class="btn" href="#ch4">How I got here</a>
+          </div>
+          <div class="scroll-cue"><i></i>Swipe up to begin</div>
+        </div>
+      </header>
+      <div class="ring" aria-hidden="true"></div>
+      <div class="lyr t-b pn">
+        <div class="ch-head">
+      <span class="ch-num">01</span>
+      <h2 class="rv" data-t="I got to start from zero">I got to start from zero</h2>
+      <p class="rv lede-box">BondScanner is an online bond platform, regulated by SEBI, that places every trade on NSE. I am its founding engineer and backend architect, and I lead the backend team.</p>
+    </div>
+      </div>
+      <i class="splat" aria-hidden="true"></i>
+    </div>
+  </div>
+  <div class="sub pn" id="bs-what">
     <div class="split">
       <div class="rv">
         <p class="big-def">BondScanner lets anyone <mark>find, compare and buy listed bonds</mark> from a phone.</p>
@@ -150,22 +179,23 @@
       </div>
     </div>
   </div>
-
-  <div class="sub" id="bs-numbers">
+  <div class="sub pn" id="bs-numbers">
     <h3 class="rv">It is already carrying real money</h3>
     <p class="sub-lede rv">BondScanner's own published figures, as of October 2026.</p>
+    <div class="fx-speed">
     <div class="stats io">
       <div class="stat"><b><span data-count="1.2" data-dec="1">1.2</span> lakh+</b><span>investors on the platform</span></div>
       <div class="stat"><b>₹<span data-count="125">125</span> Cr+</b><span>in bonds transacted</span></div>
       <div class="stat"><b><span data-count="4.7" data-dec="1">4.7</span></b><span>App Store rating, from 66 ratings</span></div>
       <div class="stat"><b><span data-count="45">45</span>%</b><span>of investments come from tier 2 and 3 cities</span></div>
     </div>
+    </div>
     <p class="note-line">Source: BondScanner's App Store listing and its July 2026 investor-data release. These are the company's figures, not my own audit.</p>
   </div>
-
-  <div class="sub" id="bs-journey">
+  <div class="sub pn" id="bs-journey">
     <h3 class="rv">The investment journey, end to end</h3>
     <p class="sub-lede rv">This is the part I architected: how an investor's money becomes a bond in their <span class="nb"><button class="term-btn" type="button" popovertarget="g-demat" style="anchor-name:--g-demat">demat account</button>.</span><span class="gloss" popover id="g-demat" style="position-anchor:--g-demat"><b>Demat account</b>An account that holds securities such as bonds in electronic form, with a depository like NSDL or CDSL.</span> <span class="wide">The exchange and the regulator are in the loop the whole way.</span> Pick a step.</p>
+    <span class="scribble s-pick" aria-hidden="true">pick a step</span>
     <div class="flowdemo io" id="flowdemo">
       <fieldset class="flow-steps">
         <legend class="lbl">One investment, five steps</legend>
@@ -254,8 +284,7 @@
       </div>
     </div>
   </div>
-
-  <div class="sub" id="bs-part">
+  <div class="sub pn" id="bs-part">
     <h3 class="rv">My part in it</h3>
     <div class="grid3 accented stagger swipe">
       <div class="card spot" style="--i:0"><span class="lbl">Architect</span><h4>I designed the systems money moves through</h4><p>Payment integrations, trade placement on NSE, settlement and holdings: the whole investment journey, plus the inventory management system that decides what can be sold.</p></div>
@@ -264,7 +293,13 @@
     </div>
     <p class="note-line">BondScanner is a team's work. The apps investors use, and many of the features in them, were built by other engineers. This page covers the backend architecture I designed and the team I lead.</p>
   </div>
-
+</section>
+<section class="chapter" id="ch2">
+  <!-- ch1 -> ch2: the manga page flips up -->
+  <div class="trans tr-flip" id="tx2" data-tx="flip">
+    <div class="stage">
+      <div class="lyr page t-a pn">
+        <div class="front">
   <div class="sub" id="bs-next">
     <h3 class="rv">And now, the second architecture</h3>
     <p class="sub-lede rv">The first architecture gets a product to market. I am now designing the next one, for two platforms at once.</p>
@@ -275,13 +310,20 @@
     </div>
     <p class="quote rv">Getting from zero to one was the first job. <span>Getting from one to what comes next is the one I am doing now.</span></p>
   </div>
-</section>
-
-<!-- ============ 02 AI AT WORK ============ -->
-<section class="chapter" id="ch2">
-  <div class="ch-head"><span class="ch-num">02</span><h2 class="rv">I also build the tools my team works with</h2><p class="rv">Leading a team means making its day easier. These are the AI initiatives I started at work: a bot that debugs support tickets, one set of skills for every AI coding tool, and a fixed path from idea to shipped feature.</p></div>
-
-  <div class="sub" id="ai-bot">
+        </div>
+        <div class="back" aria-hidden="true"></div>
+      </div>
+      <div class="shade" aria-hidden="true"></div>
+      <div class="lyr t-b pn">
+        <div class="ch-head">
+      <span class="ch-num">02</span>
+      <h2 class="rv" data-t="I also build the tools my team works with">I also build the tools my team works with</h2>
+      <p class="rv lede-box">Leading a team means making its day easier. These are the AI initiatives I started at work: a bot that debugs support tickets, one set of skills for every AI coding tool, and a fixed path from idea to shipped feature.</p>
+    </div>
+      </div>
+    </div>
+  </div>
+  <div class="sub pn" id="ai-bot">
     <h3 class="rv">A bot that answers the support channel</h3>
     <p class="sub-lede rv"><span class="wide">Support posts a problem. </span>The bot works out whether it is a real bug, investigates it, and drafts a reply with the root cause, the fix and a query to verify it.</p>
     <div class="scene">
@@ -296,7 +338,7 @@
       <div class="chat io" aria-label="Illustrative support exchange">
         <div class="chat-head"><span># tech-support</span><span class="tag">illustrative</span></div>
         <div class="chat-body">
-          <div class="msg" style="--i:0"><span class="av" style="--c:var(--p1)">SU</span>
+          <div class="msg" style="--i:0"><span class="av">SU</span>
             <div><div class="who">Support<span class="t">11:42</span></div><p>An investor paid, but the order still shows as pending. Can someone take a look?</p></div></div>
           <div class="msg" style="--i:1"><span class="av hl">B</span>
             <div><div class="who">Support bot<span class="bot">APP</span><span class="t">11:46</span></div><p>Looked into it. Here is what I found:</p>
@@ -309,20 +351,19 @@
       </div>
     </div>
   </div>
-
-  <div class="sub" id="ai-cost">
+  <div class="sub pn" id="ai-cost">
     <h3 class="rv">And it is cheap to run</h3>
     <p class="sub-lede rv">The expensive model only does what it must. Everything else goes to a far cheaper one.</p>
-    <div class="stats io">
+    <div class="fx-beta"><div class="stats io">
       <div class="stat"><b>$<span data-count="0.13" data-dec="2">0.13</span></b><span>per answered ticket</span></div>
       <div class="stat"><b>~$<span data-count="16">16</span></b><span>a month at today's volume</span></div>
       <div class="stat"><b>~<span data-count="50">50</span>%</b><span>of tickets are ops requests it leaves alone</span></div>
       <div class="stat"><b><span data-count="300">300</span>×</b><span>cheaper tokens for the investigation</span></div>
     </div>
+    </div>
     <p class="note-line">Costs are my own measurements from running the bot.</p>
   </div>
-
-  <div class="sub" id="ai-kit">
+  <div class="sub pn" id="ai-kit">
     <h3 class="rv">The rest of the toolkit</h3>
     <p class="sub-lede rv">Smaller pieces, each built to remove one daily friction.</p>
     <div class="grid3 stagger kit-cards swipe">
@@ -335,12 +376,15 @@
     </div>
   </div>
 </section>
-
-<!-- ============ 03 AFTER HOURS ============ -->
-<section class="chapter" id="ch3">
-  <div class="ch-head"><span class="ch-num">03</span><h2 class="rv">After hours, I still build</h2><p class="rv">The habit does not stop at the office door. Two side projects for myself, and before backends, research on encrypting images.</p></div>
-
-  <div class="sub" id="ah-build">
+<section class="chapter night" id="ch3">
+  <div class="lyr pn ch3-head">
+    <div class="ch-head">
+      <span class="ch-num">03</span>
+      <h2 class="rv" data-t="After hours, I still build">After hours, I still build</h2>
+      <p class="rv lede-box">The habit does not stop at the office door. Two side projects for myself, and before backends, research on encrypting images.</p>
+    </div>
+  </div>
+  <div class="sub pn" id="ah-build">
     <div class="grid2 stagger swipe">
       <div class="card spot big" style="--i:0">
         <span class="lbl">Side project · private repo</span>
@@ -364,7 +408,13 @@
       </ul>
     </div>
   </div>
-
+</section>
+<section class="chapter boardsec" id="ch4">
+  <!-- ch3 -> ch4: the poster is torn off the wall -->
+  <div class="trans tr-tear" id="tx3" data-tx="tear">
+    <div class="stage">
+      <div class="lyr poster t-a pn">
+                <div class="sheet tone-night">
   <div class="sub" id="ah-tools">
     <h3 class="rv">The toolbox so far</h3>
     <dl class="tools rv">
@@ -377,15 +427,25 @@
       <div><dt>Education</dt><dd class="plain">B.Tech in Electronics and Communication Engineering, SASTRA, 2017 – 2021</dd></div>
     </dl>
   </div>
-</section>
-
-<!-- ============ 04 THE PATH ============ -->
-<section class="chapter" id="ch4">
-  <div class="ch-head"><span class="ch-num">04</span><h2 class="rv">Three rooms taught me three things</h2><p class="rv">How I got here. Before BondScanner, I learned how software survives rules, growth and real customers, one room at a time.</p></div>
-
+        </div>
+      </div>
+      <div class="lyr board t-b pn">
+        <div class="wood" aria-hidden="true"></div>
+        <div class="scrap" aria-hidden="true"><i class="tack tk1"></i><i class="tack tk2"></i></div>
+        <div class="ch-head banner">
+      <span class="ch-num">04</span>
+      <h2 class="rv" data-t="Three rooms taught me three things">Three rooms taught me three things</h2>
+      <p class="rv lede-box">How I got here. Before BondScanner, I learned how software survives rules, growth and real customers, one room at a time.</p>
+    </div>
+      </div>
+    </div>
+  </div>
+  <div class="boardbody">
+    <div class="wood" aria-hidden="true"></div>
   <div class="rooms" style="--n:3">
 
-    <article class="room" id="r-rules" style="--i:0;--c:var(--p1)">
+    <article class="room panel pn" id="r-rules" style="--i:0">
+      <i class="tack" aria-hidden="true"></i>
       <div class="room-in">
         <div class="room-copy">
           <span class="cont-tag"><i></i>Lesson one · Rules</span>
@@ -414,7 +474,8 @@
       </div>
     </article>
 
-    <article class="room" id="r-scale" style="--i:1;--c:var(--p3)">
+    <article class="room panel pn" id="r-scale" style="--i:1">
+      <i class="tack" aria-hidden="true"></i>
       <div class="room-in">
         <div class="room-copy">
           <span class="cont-tag"><i></i>Lesson two · Scale</span>
@@ -445,7 +506,8 @@
       </div>
     </article>
 
-    <article class="room" id="r-own" style="--i:2;--c:var(--p6)">
+    <article class="room panel pn" id="r-own" style="--i:2">
+      <i class="tack" aria-hidden="true"></i>
       <div class="room-in">
         <div class="room-copy">
           <div class="room-top"><span class="cont-tag"><i></i>Lesson three · Ownership</span><span class="pill plan">In progress: re-architecting ULTRA</span></div>
@@ -482,41 +544,41 @@
     </article>
 
   </div>
-
-  <div class="sub" id="path-three">
+  <div class="sub pn paper-sub" id="path-three">
     <h3 class="rv">BondScanner needs all three, on the same day</h3>
     <p class="sub-lede rv">Each room taught one thing. The platform I architect today needs all of them at once.</p>
     <div class="pillars io swipe">
-      <div class="pillar" style="--i:0;--c:var(--p1)">
+      <div class="pillar" style="--i:0">
         <div class="nh"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div><div><h4>Rules</h4><p>Learned at Deloitte.</p></div></div>
         <ul><li>Regulated by SEBI as an online bond platform</li><li>Every trade placed on NSE and settled by its clearing corporation</li></ul>
         <div class="tags"><span class="pill live">Live</span></div>
       </div>
-      <div class="pillar" style="--i:1;--c:var(--p3)">
+      <div class="pillar" style="--i:1">
         <div class="nh"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></div><div><h4>Scale</h4><p>Learned at Good Creator Co.</p></div></div>
         <ul><li>1.2 lakh+ investors on the platform</li><li>₹125 Cr+ in bonds transacted</li></ul>
         <div class="tags"><span class="pill live">Live</span></div>
       </div>
-      <div class="pillar" style="--i:2;--c:var(--p6)">
+      <div class="pillar" style="--i:2">
         <div class="nh"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg></div><div><h4>Ownership</h4><p>Learned at Tap Invest.</p></div></div>
         <ul><li>Payments, inventory, trades, settlement, holdings</li><li>The architecture and the team are mine to answer for</li></ul>
         <div class="tags"><span class="pill live">Live</span></div>
       </div>
     </div>
-    <div class="hub io"><span class="hub-dots"><i style="--c:var(--p1)"></i><i style="--c:var(--p3)"></i><i style="--c:var(--p6)"></i></span><b>BondScanner</b><span>needs all three, at once</span></div>
+    <div class="hub io"><span class="hub-dots"><i></i><i></i><i></i></span><b>BondScanner</b><span>needs all three, at once</span></div>
+  </div>
   </div>
 </section>
-
-<!-- ============ 05 THE ASK ============ -->
-<section class="chapter last" id="ch5">
+<section class="chapter last pn" id="ch5">
   <div class="closing io">
     <span class="ch-num">05</span>
-    <h2>Starting something from zero? Let's talk.</h2>
-    <p>I am an engineer at heart with a product owner's habits. If you are at the first schema, the first service or the first hires, I would like to hear about it.</p>
-    <div class="cta-row">
-      <a class="btn primary" href="https://www.linkedin.com/in/avint8" target="_blank" rel="me noopener">LinkedIn <span aria-hidden="true">↗</span></a>
-      <a class="btn" href="https://github.com/avint8" target="_blank" rel="me noopener">GitHub <span aria-hidden="true">↗</span></a>
-      <a class="btn" href="mailto:avint8@gmail.com">Email me</a>
+    <h2>Starting something from zero? <span class="wet">Let's talk.</span></h2>
+    <div class="bubble">
+      <p>I am an engineer at heart with a product owner's habits. If you are at the first schema, the first service or the first hires, I would like to hear about it.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="https://www.linkedin.com/in/avint8" target="_blank" rel="me noopener">LinkedIn <span aria-hidden="true">↗</span></a>
+        <a class="btn" href="https://github.com/avint8" target="_blank" rel="me noopener">GitHub <span aria-hidden="true">↗</span></a>
+        <a class="btn" href="mailto:avint8@gmail.com">Email me</a>
+      </div>
     </div>
   </div>
 
@@ -533,13 +595,14 @@
         <li><b>Simplified:</b> the investment-journey diagram leaves out vendor names and internal service design.</li>
       </ul>
     </details>
+    <nav class="styles-row" aria-label="Other styles of this site"><span class="sr-lbl">Other styles</span><a href="/styles/ukiyoe/" aria-label="See this site in Ukiyo-e style" title="See this site in Ukiyo-e style" aria-current="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2 19c3-1 4-5 7-5 2 0 3 2 4 2 2 0 2-4 5-7 1-1.5 3-1.5 4-.5-1 1-1.500 2-1 3 .5 1-.5 2-2 2"/><path d="M2 22h20"/></svg></a><a href="/styles/sumi/" aria-label="See this site in Sumi style" title="See this site in Sumi style"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><path d="M3 20c4-1 7-1 11-3"/></svg></a><a href="/styles/shonen/" aria-label="See this site in Shonen style" title="See this site in Shonen style"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18"/><path d="M12 12L3 3M12 12l9-9M12 12v-9M12 12l-9 4M12 12l9 4"/></svg></a><a href="/styles/typewriter/" aria-label="See this site in Typewriter style" title="See this site in Typewriter style"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 9V4h8v5"/><rect x="3" y="9" width="18" height="11" rx="1.5"/><path d="M7 13h.01M10 13h.01M13 13h.01M16 13h.01M8 16.5h8"/></svg></a><a href="/styles/pixel/" aria-label="See this site in E-ink pixel style" title="See this site in E-ink pixel style"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true" focusable="false"><path d="M4 4h4v4H4zM12 4h4v4h-4zM8 8h4v4H8zM16 8h4v4h-4zM4 12h4v4H4zM12 12h4v4h-4zM8 16h4v4H8zM16 16h4v4h-4z"/></svg></a><a href="/styles/original/" aria-label="See this site in the Original style" title="See this site in the Original style"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8"/></svg></a><a href="/styles/" aria-label="See all styles" title="See all styles"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><rect x="14" y="14" width="6" height="6"/></svg></a></nav>
     <p>Designed with the Story Page design language. No cookies, no ads. Cloudflare counts visits without cookies. <span class="kbd">J</span> <span class="kbd">K</span> step through the page.</p>
   </footer>
 </section>
 
-</div>
 </main>
 
-<script src="js/site.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js" defer></script>
+<script src="js/site.js" defer></script>
 </body>
 </html>
